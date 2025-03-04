@@ -75,6 +75,18 @@ $ npm run test:cov
 ```
 src/
 │
+│── respondents/                # Модуль ответов респондентов
+│   ├── respondents.controller.ts
+│   ├── respondents.module.ts
+│   ├── respondents.service.ts
+│── surveys/                    # Модуль анкет
+│   ├── surveys.controller.ts
+│   ├── surveys.module.ts
+│   ├── surveys.service.ts
+│── users/                      # Модуль пользователей
+│   ├── users.controller.ts
+│   ├── users.module.ts
+│   ├── users.service.ts
 │── app.controller.ts
 │── app.module.ts
 │── app.service.ts

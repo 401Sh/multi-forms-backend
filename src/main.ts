@@ -6,8 +6,8 @@ import { Logger, LogLevel } from '@nestjs/common';
 
 dotenv.config();
 
-const host = process.env.HOST || "127.0.0.1";
-const port = process.env.PORT || 3000;
+const host = process.env.HOST || '127.0.0.1';
+const port = process.env.PORT ? +process.env.PORT : 3000;
 
 const logLevels = process.env.LOG_LEVEL?.split(',') as LogLevel[] || ['log', 'error', 'warn'];
 
@@ -17,9 +17,9 @@ async function bootstrap() {
   app.useLogger(logLevels);
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle("Multi forms backend API")
-    .setDescription("API documentation")
-    .setVersion("1.0")
+    .setTitle('Multi forms backend API')
+    .setDescription('API documentation')
+    .setVersion('1.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
