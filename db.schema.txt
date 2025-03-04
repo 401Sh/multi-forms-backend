@@ -1,0 +1,74 @@
+// =================== Анкеты ===================
+
+Table Survey {
+  id int [primary key]
+  userId int [not null]
+  name varchar [not null]
+  description varchar
+  published bool [default: false]
+  access enum [default: "private"]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+}
+
+Table Question {
+  id int [primary key]
+  surveyId int [not null]
+  name varchar
+  position Object_id [not null]
+  questionText varchar
+  isMandatory boolean [default: false]
+  type enum [not null]
+}
+
+Table QuestionOption {
+  id int [primary key]
+  position Object_id [not null]
+  questionId int [not null]
+  text varchar [not null]
+}
+
+// =================== Ответы ===================
+
+Table User {
+  id int [primary key]
+  login varchar [unique, not null]
+  password varchar [not null]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+}
+
+Table Respondent {
+  id int [primary key]
+  userId int [not null]
+  surveyId int [not null]
+  createdAt timestamp [not null]
+}
+
+Table Answer {
+  id int [primary key]
+  // userId int [unique, not null]
+  respondentId int [not null]
+  questionId int [not null]
+  answerText varchar
+}
+
+Table AnswerOption {
+  id int [primary key]
+  optionId int
+  AnswerId int
+}
+
+// =================== Связи ===================
+
+Ref: User.id < Survey.userId
+Ref: User.id < Respondent.userId
+Ref: Survey.id < Question.surveyId
+Ref: Question.id < QuestionOption.questionId
+
+// Ref: User.id < Answer.userId
+Ref: Survey.id < Respondent.surveyId
+Ref: Respondent.id < Answer.respondentId
+Ref: Question.id < Answer.questionId
+Ref: AnswerOption.AnswerId < Answer.id
+Ref: AnswerOption.optionId < QuestionOption.id

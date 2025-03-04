@@ -1,0 +1,27 @@
+{
+  "name": "multi-page-forms-backend",
+  "version": "0.0.1",
+  "description": "A Node.js backend setup, built with NestJS, designed to manage multi-page form submissions.",
+  "main": "./build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc && node build/index.js"
+  },
+  "keywords": [
+    "nestjs",
+    "jwt",
+    "form"
+  ],
+  "author": "401Sh",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  },
+  "type": "module"
+}
