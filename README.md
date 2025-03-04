@@ -26,10 +26,34 @@
 
 ## Установка
 
-1. null
+```bash
+$ npm install
+```
+
+## Запуск
 
 ```bash
-null
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
+```
+
+## Запуск тестов
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
 ```
 
 ## Структура БД
@@ -51,6 +75,9 @@ null
 ```
 src/
 │
+│── app.controller.ts
+│── app.module.ts
+│── app.service.ts
 .env
 tsconfig.json
 package.json
