@@ -5,8 +5,9 @@ Table Survey {
   userId int [not null]
   name varchar [not null]
   description varchar
-  published bool [default: false]
+  isPublished bool [default: false]
   access enum [default: "private"]
+  totalPoints int
   createdAt timestamp [not null]
   updatedAt timestamp [not null]
 }
@@ -15,17 +16,22 @@ Table Question {
   id int [primary key]
   surveyId int [not null]
   name varchar
-  position Object_id [not null]
+  page int [not null]
+  position int [default: 1]
   questionText varchar
   isMandatory boolean [default: false]
+  answer varchar
+  points int [default: 0]
   type enum [not null]
 }
 
 Table QuestionOption {
   id int [primary key]
-  position Object_id [not null]
-  questionId int [not null]
+  position int [not null]
+  isCorrect bool [default: false]
+  points int [default: 0]
   text varchar [not null]
+  questionId int [not null]
 }
 
 // =================== Ответы ===================
@@ -40,6 +46,8 @@ Table User {
 
 Table Respondent {
   id int [primary key]
+  score int [default: 0]
+  totalPoints int
   userId int [not null]
   surveyId int [not null]
   createdAt timestamp [not null]
@@ -55,8 +63,8 @@ Table Answer {
 
 Table AnswerOption {
   id int [primary key]
-  optionId int
-  AnswerId int
+  optionId int [not null]
+  answerId int [not null]
 }
 
 // =================== Связи ===================
@@ -70,5 +78,5 @@ Ref: Question.id < QuestionOption.questionId
 Ref: Survey.id < Respondent.surveyId
 Ref: Respondent.id < Answer.respondentId
 Ref: Question.id < Answer.questionId
-Ref: AnswerOption.AnswerId < Answer.id
-Ref: AnswerOption.optionId < QuestionOption.id
+Ref: AnswerOption.answerId > Answer.id
+Ref: AnswerOption.optionId > QuestionOption.id

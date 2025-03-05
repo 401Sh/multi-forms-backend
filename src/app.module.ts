@@ -10,6 +10,7 @@ import { RespondentsModule } from './respondents/respondents.module';
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot(dataSourceOptions),
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
