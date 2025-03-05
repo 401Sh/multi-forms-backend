@@ -27,29 +27,21 @@ Table Question {
 
 Table QuestionOption {
   id int [primary key]
+  questionId int [not null]
   position int [not null]
   isCorrect bool [default: false]
   points int [default: 0]
   text varchar [not null]
-  questionId int [not null]
 }
 
 // =================== Ответы ===================
 
-Table User {
-  id int [primary key]
-  login varchar [unique, not null]
-  password varchar [not null]
-  createdAt timestamp [not null]
-  updatedAt timestamp [not null]
-}
-
 Table Respondent {
   id int [primary key]
-  score int [default: 0]
-  totalPoints int
   userId int [not null]
   surveyId int [not null]
+  score int [default: 0]
+  totalPoints int
   createdAt timestamp [not null]
 }
 
@@ -67,6 +59,27 @@ Table AnswerOption {
   answerId int [not null]
 }
 
+// =============== Пользователи ================
+
+Table User {
+  id int [primary key]
+  login varchar [unique, not null]
+  password varchar [not null]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+}
+
+Table RefreshSession {
+  id int [primary key]
+  userId int [not null]
+  refreshToken varchar [unique, not null]
+  userAgent varchar
+  ip varchar
+  fingerprint varchar
+  expiresAt timestamp [not null]
+  createdAt timestamp [not null]
+}
+
 // =================== Связи ===================
 
 Ref: User.id < Survey.userId
@@ -80,3 +93,5 @@ Ref: Respondent.id < Answer.respondentId
 Ref: Question.id < Answer.questionId
 Ref: AnswerOption.answerId > Answer.id
 Ref: AnswerOption.optionId > QuestionOption.id
+
+Ref: User.id < RefreshSession.userId

@@ -1,3 +1,4 @@
+import { RefreshSessionEntity } from 'src/auths/entities/refresh-session.entity';
 import { RespondentEntity } from 'src/respondents/entities/respondent.entity';
 import { SurveyEntity } from 'src/surveys/entities/survey.entity';
 import { 
@@ -32,4 +33,7 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => RespondentEntity, (respondent) => respondent.user)
   respondents: RespondentEntity[];
+
+  @OneToMany(() => RefreshSessionEntity, (refreshSessions) => refreshSessions.user)
+  refreshSessions: RefreshSessionEntity[];
 };
