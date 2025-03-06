@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { DeleteResult, Repository } from 'typeorm';
@@ -26,12 +26,12 @@ export class UsersService {
       createUserDto.password = await this.hashData(createUserDto.password);
     }
 
-    const user = this.userRepository.save({
+    const user = await this.userRepository.save({
       ...createUserDto
     });
 
     UsersService.logger.log(`Created user: ${createUserDto.login}`);
-    UsersService.logger.debug(`Created user: ${user}`);
+    UsersService.logger.debug('Created user: ', user);
     return user;
   };
 
@@ -46,12 +46,17 @@ export class UsersService {
   };
 
 
-  // bad solution
-  async findById(id: string) {
-    const user = await this.userRepository.findOne({ where: { id: id } });
+
+  async findById(id: string): Promise<UserEntity> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .select(['user.id', 'user.login'])
+      .getOne();
+
     if (!user) {
       UsersService.logger.log(`No user with id: ${id}`);
-      return null;
+      throw new BadRequestException('User does not exist');
     };
 
     UsersService.logger.log(`Finded user with id: ${id}`);
@@ -59,11 +64,19 @@ export class UsersService {
   };
 
 
-  async findByLogin(login: string): Promise<UserEntity | null> {
-    const user = await this.userRepository.findOne({ where: { login: login } });
+  /**
+   * Only for **internal** use
+  */
+  async findByLogin(login: string): Promise<UserEntity> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.login = :login', { login })
+      .select(['user.id', 'user.login', 'user.password'])
+      .getOne();
+
     if (!user) {
       UsersService.logger.log(`No user with login: ${login}`);
-      return null;
+      throw new BadRequestException('User does not exist');
     };
 
     UsersService.logger.log(`Finded user with login: ${login}`);
@@ -74,24 +87,44 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     UsersService.logger.log(`Updating user with id: ${id}`);
 
+    // Check user
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      UsersService.logger.log(`Cannot update user. No user with id: ${id}`);
+      throw new NotFoundException(`User with id ${id} not found`);
+    };
+
+    // Check login
+    if (updateUserDto.login) {
+      const isAvailable = await this.isLoginAvailable(updateUserDto.login);
+      if (!isAvailable) {
+        throw new BadRequestException(`Login "${updateUserDto.login}" is already taken`);
+      };
+    };
+
     if (updateUserDto.password) {
       updateUserDto.password = await this.hashData(updateUserDto.password);
-    }
+    };
 
     UsersService.logger.log(`Updating user with id: ${id}`);
     await this.userRepository.update({ id: id }, updateUserDto);
 
-    const updatedUser = await this.userRepository
-      .createQueryBuilder('user')
-      .select(['user.login'])
-      .getOne();
+    const updatedUser = await this.userRepository.findOne({ where: { id } });
     return { login: updatedUser?.login };
-  }
+  };
 
 
-  async deleteById(id: string) {
+  async deleteById(id: string): Promise<DeleteResult> {
     UsersService.logger.log(`Deleting user with id: ${id}`);
-    return this.userRepository.delete({ id: id });
+
+    const deleteResult = await this.userRepository.delete({ id: id });
+
+    if (deleteResult.affected === 0) {
+      UsersService.logger.log(`Cannot delete user. No user with id: ${id}`);
+      throw new NotFoundException(`User with id ${id} not found`);
+    };
+
+    return deleteResult;
   };
 
 

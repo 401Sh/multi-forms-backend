@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, UseGuards, Request, Delete, HttpStatus, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, UseGuards, Request, Delete, HttpStatus, Patch, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Response } from 'express';
 
 @ApiTags('users')
 @Controller('users')
@@ -51,13 +52,16 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @Delete('me')
-  async deleteMe(@Request() req) {
+  async deleteMe(
+    @Request() req,
+    @Res() res: Response
+  ) {
     const userId = req.user['sub'];
     await this.usersService.deleteById(userId);
 
-    return {
-      statusCode: HttpStatus.NO_CONTENT,
-      message: 'User deleted successfully',
-    };
+    res.clearCookie('refreshToken', { path: '/' });
+
+    // for some reasons res.status(204).send() doesnt work
+    return res.send({ message: 'User deleted successfully', statusCode: 204 });
   };
 };

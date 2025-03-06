@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
@@ -78,12 +78,12 @@ export class AuthsService {
   async logout(userId: string, fp: string) {
     const user = await this.usersService.findById(userId);
     if (!user) {
-      AuthsService.logger.error(`User with id: ${userId} - not found. Cannot delete refreshToken`);
+      AuthsService.logger.error(`User with id: ${userId} - not found`);
       throw new Error('User not found');
     };
 
     AuthsService.logger.log(`Deleting user ${userId} session`);
-    return this.refreshSessionRepository.delete({ user, fingerprint: fp });
+    return this.refreshSessionRepository.delete({ user: { id: user.id }, fingerprint: fp });
   };
 
 

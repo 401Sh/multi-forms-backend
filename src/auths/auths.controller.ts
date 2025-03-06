@@ -59,7 +59,7 @@ export class AuthsController {
     await this.authService.logout(req.user['sub'], fingerprint);
     res.clearCookie('refreshToken', { path: '/' });
 
-    res.status(200).send({ message: 'Succesfully logout' });
+    return res.status(200).send({ message: 'Succesfully logout' });
   };
 
 
