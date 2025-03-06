@@ -40,12 +40,20 @@ export class QuestionEntity extends BaseEntity {
   @Column({ type: 'enum', enum: QuestionType })
   type!: QuestionType;
 
-  @OneToMany(() => QuestionOptionEntity, (questionOption) => questionOption.question)
+  @OneToMany(
+    () => QuestionOptionEntity,
+    (questionOption) => questionOption.question,
+    { cascade: true, onDelete: 'CASCADE' }
+  )
   questionOptions: QuestionOptionEntity[];
 
-  @OneToMany(() => AnswerEntity, (answer) => answer.question)
+  @OneToMany(
+    () => AnswerEntity,
+    (answer) => answer.question,
+    { cascade: true, onDelete: 'CASCADE' }
+  )
   answers: AnswerEntity[];
 
-  @ManyToOne(() => SurveyEntity, (survey) => survey.questions)
+  @ManyToOne(() => SurveyEntity, (survey) => survey.questions, { onDelete: 'CASCADE' })
   survey: SurveyEntity;
 };

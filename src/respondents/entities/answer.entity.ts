@@ -19,13 +19,20 @@ export class AnswerEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 512 })
   answerText: string;
 
-  @ManyToOne(() => RespondentEntity, (respondent) => respondent.answers)
+  @ManyToOne(
+    () => RespondentEntity,
+    (respondent) => respondent.answers,
+    { onDelete: 'CASCADE' }
+  )
   respondent: RespondentEntity;
   
-  @ManyToOne(() => QuestionEntity, (question) => question.answers)
+  @ManyToOne(
+    () => QuestionEntity,
+    (question) => question.answers,
+    { onDelete: 'CASCADE' }
+  )
   question: QuestionEntity;
 
   @OneToMany(() => AnswerOptionEntity, (answerOptions) => answerOptions.answer)
-  @JoinTable()
   answerOptions: AnswerOptionEntity[];
 };

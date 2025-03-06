@@ -14,6 +14,6 @@ export const dataSourceOptions: DataSourceOptions = {
   database: process.env.DB_NAME,
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/db/migrations/*.js'],
-  synchronize: false,   // включить в будущем при необходимости
+  synchronize: true,   // включить в будущем при необходимости
   logging: false,
 };

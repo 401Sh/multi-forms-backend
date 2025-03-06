@@ -12,9 +12,17 @@ export class AnswerOptionEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => AnswerEntity, (answer) => answer.answerOptions)
+  @ManyToOne(
+    () => AnswerEntity,
+    (answer) => answer.answerOptions,
+    { onDelete: 'CASCADE' }
+  )
   answer: AnswerEntity;
   
-  @ManyToOne(() => QuestionOptionEntity, (questionOption) => questionOption.answerOptions)
+  @ManyToOne(
+    () => QuestionOptionEntity,
+    (questionOption) => questionOption.answerOptions,
+    { onDelete: 'CASCADE' }
+  )
   questionOption: QuestionOptionEntity;
 };
