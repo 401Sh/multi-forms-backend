@@ -16,16 +16,23 @@ export class AnswerEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 512 })
-  answerText: string;
+  @Column({ type: 'varchar', length: 512, nullable: true })
+  answerText?: string;
 
-  @ManyToOne(() => RespondentEntity, (respondent) => respondent.answers)
+  @ManyToOne(
+    () => RespondentEntity,
+    (respondent) => respondent.answers,
+    { onDelete: 'CASCADE', nullable: false }
+  )
   respondent: RespondentEntity;
   
-  @ManyToOne(() => QuestionEntity, (question) => question.answers)
+  @ManyToOne(
+    () => QuestionEntity,
+    (question) => question.answers,
+    { onDelete: 'CASCADE', nullable: false }
+  )
   question: QuestionEntity;
 
   @OneToMany(() => AnswerOptionEntity, (answerOptions) => answerOptions.answer)
-  @JoinTable()
   answerOptions: AnswerOptionEntity[];
 };

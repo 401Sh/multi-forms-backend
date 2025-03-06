@@ -31,6 +31,10 @@ export class RefreshSessionEntity extends BaseEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user.refreshSessions)
+  @ManyToOne(
+    () => UserEntity,
+    (user) => user.refreshSessions,
+    { onDelete: 'CASCADE', nullable: false }
+  )
   user: UserEntity
 };

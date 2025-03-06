@@ -25,12 +25,24 @@ export class RespondentEntity extends BaseEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(() => AnswerEntity, (answer) => answer.respondent)
+  @OneToMany(
+    () => AnswerEntity,
+    (answer) => answer.respondent,
+    { cascade: true, onDelete: 'CASCADE' }
+  )
   answers: AnswerEntity[];
 
-  @ManyToOne(() => SurveyEntity, (survey) => survey.respondents)
+  @ManyToOne(
+    () => SurveyEntity,
+    (survey) => survey.respondents,
+    { onDelete: 'CASCADE', nullable: false }
+  )
   survey: SurveyEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.respondents)
+  @ManyToOne(
+    () => UserEntity,
+    (user) => user.respondents,
+    { onDelete: 'SET NULL', nullable: true }
+  )
   user: UserEntity;
 };

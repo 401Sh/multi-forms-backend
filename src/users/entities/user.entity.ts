@@ -34,6 +34,10 @@ export class UserEntity extends BaseEntity {
   @OneToMany(() => RespondentEntity, (respondent) => respondent.user)
   respondents: RespondentEntity[];
 
-  @OneToMany(() => RefreshSessionEntity, (refreshSessions) => refreshSessions.user)
+  @OneToMany(
+    () => RefreshSessionEntity,
+    (refreshSessions) => refreshSessions.user,
+    { cascade: true, onDelete: 'CASCADE' }
+  )
   refreshSessions: RefreshSessionEntity[];
 };

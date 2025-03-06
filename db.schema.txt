@@ -2,7 +2,7 @@
 
 Table Survey {
   id int [primary key]
-  userId int [not null]
+  userId int
   name varchar [not null]
   description varchar
   isPublished bool [default: false]
@@ -38,7 +38,7 @@ Table QuestionOption {
 
 Table Respondent {
   id int [primary key]
-  userId int [not null]
+  userId int
   surveyId int [not null]
   score int [default: 0]
   totalPoints int

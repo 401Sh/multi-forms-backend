@@ -25,10 +25,18 @@ export class QuestionOptionEntity extends BaseEntity {
 
   @Column({ type: 'varchar', length: 512 })
   text: string;
-
-  @ManyToOne(() => QuestionEntity, (question) => question.questionOptions)
-  question: QuestionEntity;
-
-  @OneToMany(() => AnswerOptionEntity, (answerOptions) => answerOptions.questionOption)
+  
+  @OneToMany(
+    () => AnswerOptionEntity,
+    (answerOptions) => answerOptions.questionOption,
+    { cascade: true }
+  )
   answerOptions: AnswerOptionEntity[];
+  
+  @ManyToOne(
+    () => QuestionEntity,
+    (question) => question.questionOptions,
+    { onDelete: 'CASCADE', nullable: false }
+  )
+  question: QuestionEntity;
 };

@@ -39,12 +39,24 @@ export class SurveyEntity extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => QuestionEntity, (question) => question.survey)
+  @OneToMany(
+    () => QuestionEntity,
+    (question) => question.survey,
+    { cascade: true, onDelete: 'CASCADE' }
+  )
   questions: QuestionEntity[];
 
-  @OneToMany(() => RespondentEntity, (respondent) => respondent.survey)
+  @OneToMany(
+    () => RespondentEntity,
+    (respondent) => respondent.survey,
+    { cascade: true, onDelete: 'CASCADE' }
+  )
   respondents: RespondentEntity[];
 
-  @ManyToOne(() => UserEntity, (user) => user.surveys)
+  @ManyToOne(
+    () => UserEntity,
+    (user) => user.surveys,
+    { onDelete: 'SET NULL', nullable: true }
+  )
   user: UserEntity;
 };
