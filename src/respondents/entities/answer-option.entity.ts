@@ -15,14 +15,14 @@ export class AnswerOptionEntity extends BaseEntity {
   @ManyToOne(
     () => AnswerEntity,
     (answer) => answer.answerOptions,
-    { onDelete: 'CASCADE' }
+    { onDelete: 'CASCADE', nullable: false }
   )
   answer: AnswerEntity;
   
   @ManyToOne(
     () => QuestionOptionEntity,
     (questionOption) => questionOption.answerOptions,
-    { onDelete: 'CASCADE' }
+    { onDelete: 'CASCADE', nullable: false }
   )
   questionOption: QuestionOptionEntity;
 };

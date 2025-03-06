@@ -35,15 +35,14 @@ export class RespondentEntity extends BaseEntity {
   @ManyToOne(
     () => SurveyEntity,
     (survey) => survey.respondents,
-    { onDelete: 'CASCADE' }
+    { onDelete: 'CASCADE', nullable: false }
   )
   survey: SurveyEntity;
 
   @ManyToOne(
     () => UserEntity,
     (user) => user.respondents,
-    { onDelete: 'SET NULL' }
+    { onDelete: 'SET NULL', nullable: true }
   )
-  @Column({ nullable: true })
   user: UserEntity;
 };

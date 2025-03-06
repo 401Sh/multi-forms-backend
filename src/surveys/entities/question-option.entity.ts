@@ -36,7 +36,7 @@ export class QuestionOptionEntity extends BaseEntity {
   @ManyToOne(
     () => QuestionEntity,
     (question) => question.questionOptions,
-    { onDelete: 'CASCADE' }
+    { onDelete: 'CASCADE', nullable: false }
   )
   question: QuestionEntity;
 };

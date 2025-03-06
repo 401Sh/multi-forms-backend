@@ -53,7 +53,10 @@ export class SurveyEntity extends BaseEntity {
   )
   respondents: RespondentEntity[];
 
-  @ManyToOne(() => UserEntity, (user) => user.surveys, { onDelete: 'SET NULL' })
-  @Column({ nullable: true })
+  @ManyToOne(
+    () => UserEntity,
+    (user) => user.surveys,
+    { onDelete: 'SET NULL', nullable: true }
+  )
   user: UserEntity;
 };

@@ -17,7 +17,7 @@ export class QuestionEntity extends BaseEntity {
   id: string;
 
   @Column({ type: 'varchar', length: 255 })
-  name!: string;
+  name: string;
 
   @Column({ type: 'integer', default: 1 })
   page: number;
@@ -54,6 +54,10 @@ export class QuestionEntity extends BaseEntity {
   )
   answers: AnswerEntity[];
 
-  @ManyToOne(() => SurveyEntity, (survey) => survey.questions, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => SurveyEntity,
+    (survey) => survey.questions,
+    { onDelete: 'CASCADE', nullable: false }
+  )
   survey: SurveyEntity;
 };

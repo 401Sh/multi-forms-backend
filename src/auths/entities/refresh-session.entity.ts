@@ -34,7 +34,7 @@ export class RefreshSessionEntity extends BaseEntity {
   @ManyToOne(
     () => UserEntity,
     (user) => user.refreshSessions,
-    { onDelete: 'CASCADE' }
+    { onDelete: 'CASCADE', nullable: false }
   )
   user: UserEntity
 };
