@@ -1,9 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -15,10 +16,15 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity>{
-    // const isAvailable = await this.isLoginAvailable(userDto.login);
-    // if (!isAvailable) {
-    //   throw new ConflictException(`Login ${userDto.login} is already used`);
-    // };
+    const isAvailable = await this.isLoginAvailable(createUserDto.login);
+    if (!isAvailable) {
+      UsersService.logger.log(`Cannot create user. Login ${createUserDto.login} is already used`);
+      throw new ConflictException(`Login ${createUserDto.login} is already used`);
+    };
+
+    if (createUserDto.password) {
+      createUserDto.password = await this.hashData(createUserDto.password);
+    }
 
     const user = this.userRepository.save({
       ...createUserDto
@@ -32,11 +38,16 @@ export class UsersService {
 
   async findAll(): Promise<UserEntity[]> {
     UsersService.logger.log(`Finding all users`);
-    return this.userRepository.find();
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .select(['user.id', 'user.login'])
+      .getMany();
+    return users;
   };
 
 
-  async findById(id: string): Promise<UserEntity | null> {
+  // bad solution
+  async findById(id: string) {
     const user = await this.userRepository.findOne({ where: { id: id } });
     if (!user) {
       UsersService.logger.log(`No user with id: ${id}`);
@@ -60,13 +71,25 @@ export class UsersService {
   }
 
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     UsersService.logger.log(`Updating user with id: ${id}`);
-    return this.userRepository.update({ id: id }, updateUserDto)
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await this.hashData(updateUserDto.password);
+    }
+
+    UsersService.logger.log(`Updating user with id: ${id}`);
+    await this.userRepository.update({ id: id }, updateUserDto);
+
+    const updatedUser = await this.userRepository
+      .createQueryBuilder('user')
+      .select(['user.login'])
+      .getOne();
+    return { login: updatedUser?.login };
   }
 
 
-  async deleteById(id: string): Promise<DeleteResult> {
+  async deleteById(id: string) {
     UsersService.logger.log(`Deleting user with id: ${id}`);
     return this.userRepository.delete({ id: id });
   };
@@ -75,5 +98,10 @@ export class UsersService {
   async isLoginAvailable(login: string): Promise<boolean> {
     const existingUser = await this.userRepository.findOne({ where: { login } });
     return !existingUser;
+  };
+
+
+  hashData(data: string) {
+    return argon2.hash(data);
   };
 };

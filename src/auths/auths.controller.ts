@@ -18,7 +18,7 @@ export class AuthsController {
     @Headers('user-agent') userAgent: string,
     @Headers('x-fingerprint') fingerprint: string,
     @Ip() ip: string,
-    @Body()createUserDto: CreateUserDto,
+    @Body() createUserDto: CreateUserDto,
     @Res() res: Response
   ) {
     const tokens = await this.authService.signUp(
@@ -30,12 +30,13 @@ export class AuthsController {
     return res.json({ accessToken: tokens.accessToken });
   };
 
+
   @Post('signin')
   async signin(
     @Headers('user-agent') userAgent: string,
     @Headers('x-fingerprint') fingerprint: string,
     @Ip() ip: string,
-    @Body()authDto: AuthDto,
+    @Body() authDto: AuthDto,
     @Res() res: Response
   ) {
     const tokens = await this.authService.signIn(
@@ -47,14 +48,15 @@ export class AuthsController {
     return res.json({ accessToken: tokens.accessToken });
   };
 
+  
   @UseGuards(AccessTokenGuard)
   @Get('logout')
-  logout(
+  async logout(
     @Headers('x-fingerprint') fingerprint: string,
     @Request() req,
     @Res() res: Response
   ) {
-    this.authService.logout(req.user['sub'], fingerprint);
+    await this.authService.logout(req.user['sub'], fingerprint);
     res.clearCookie('refreshToken', { path: '/' });
 
     res.status(200).send({ message: 'Succesfully logout' });

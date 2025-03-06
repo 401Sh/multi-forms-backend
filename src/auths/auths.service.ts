@@ -26,22 +26,10 @@ export class AuthsService {
 
 
   async signUp(createUserDto: CreateUserDto, ua: string, ip: string, fp: string) {
-    // Check if user exists
-    const userExists = await this.usersService.isLoginAvailable(
-      createUserDto.login,
-    );
-    if (!userExists) {
-      throw new ConflictException('User already exists');
-    };
-
-    // Hash password
-    const hash = await this.hashData(createUserDto.password);
-
     // Create user
-    const newUser = await this.usersService.create({
-      ...createUserDto,
-      password: hash,
-    });
+    const newUser = await this.usersService.create(
+      { ...createUserDto }
+    );
 
     // Create tokens
     const tokens = await this.getTokens(newUser.id, newUser.login);
