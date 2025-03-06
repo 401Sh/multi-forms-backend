@@ -156,6 +156,15 @@ export class AuthsService {
       throw new ForbiddenException('Access Denied');
     };
 
+    // Check if token has expired
+    const currentTime = new Date();
+    console.log(currentTime)
+    console.log(session.expiresAt)
+    if (session.expiresAt < currentTime) {
+      AuthsService.logger.log(`Access denied for user: ${user.id}. Refresh token expired`);
+      throw new ForbiddenException('Refresh token expired');
+    }
+
     const refreshTokenMatches = await argon2.verify(
       session.refreshToken,
       refreshToken
