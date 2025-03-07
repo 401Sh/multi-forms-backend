@@ -16,26 +16,26 @@ export class QuestionEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  name: string;
+  @Column({ type: 'varchar', length: 255, default: 'Новый вопрос' })
+  name: string = 'Новый вопрос';
 
   @Column({ type: 'integer', default: 1 })
-  page: number;
+  page: number = 1;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', nullable: false })
   position!: number;
 
-  @Column({ type: 'varchar', length: 512 })
-  questionText: string;
+  @Column({ type: 'varchar', length: 512, default: '' })
+  questionText: string = '';
 
   @Column({ type: 'bool', default: false })
-  isMandatory: boolean;
+  isMandatory: boolean = false;
 
-  @Column({ type: 'varchar' })
-  answer: string;
+  @Column({ type: 'varchar', nullable: true })
+  answer?: string;
 
   @Column({ type: 'integer', default: 0 })
-  points: number;
+  points: number = 0;
 
   @Column({ type: 'enum', enum: QuestionType })
   type!: QuestionType;

@@ -13,7 +13,11 @@ export class RefreshSessionEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 512, unique: true })
+  @Column({
+    type: 'varchar',
+    length: 512, unique:
+    true, nullable: false
+  })
   refreshToken!: string;
 
   @Column({ type: 'varchar', length: 512 })

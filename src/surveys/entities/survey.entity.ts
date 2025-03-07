@@ -19,19 +19,19 @@ export class SurveyEntity extends BaseEntity {
   id: string;
 
   @Column({ type: 'varchar', length: 255, default: 'Новый опрос' })
-  name: string;
+  name: string = 'Новый опрос';
 
   @Column({ type: 'varchar', length: 512, default: '' })
-  description: string;
+  description: string = '';
 
   @Column({ type: 'bool', default: false })
-  isPublished: boolean;
+  isPublished: boolean = false;
 
   @Column({ type: 'enum', enum: SurveyAccess, default: SurveyAccess.PUBLIC })
-  access: SurveyAccess;
+  access: SurveyAccess = SurveyAccess.PUBLIC;
 
   @Column({ type: 'integer', default: 0 })
-  totalPoints: number;
+  totalPoints: number = 0;
 
   @CreateDateColumn()
   createdAt: Date;
