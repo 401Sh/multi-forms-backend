@@ -175,7 +175,7 @@ export class AuthsService {
 
     this.deleteRefreshSession(user, fingerprint);
 
-    AuthsService.logger.debug(`Created new jwt tokens: ${tokens}`);
+    AuthsService.logger.debug(`Created new jwt tokens for user ${user.id}`);
     return tokens;
   };
 
@@ -237,7 +237,7 @@ export class AuthsService {
 
 
   async deleteRefreshSession(user: UserEntity, fp: string){
-    AuthsService.logger.debug(`Deleting session of user id: ${user.id}, fp: ${fp}`);
+    AuthsService.logger.debug(`Deleting session of user id: ${user.id}`);
     return this.refreshSessionRepository.delete({ user: { id: user.id }, fingerprint: fp });
   }
 

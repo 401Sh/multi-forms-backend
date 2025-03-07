@@ -31,7 +31,7 @@ export class UsersService {
     });
 
     UsersService.logger.log(`Created user: ${createUserDto.login}`);
-    UsersService.logger.debug('Created user: ', user);
+    UsersService.logger.debug('Created user', user);
     return user;
   };
 
@@ -39,8 +39,8 @@ export class UsersService {
   async findAll(): Promise<UserEntity[]> {
     UsersService.logger.log(`Finding all users`);
     const users = await this.userRepository
-      .createQueryBuilder('user')
-      .select(['user.id', 'user.login'])
+      .createQueryBuilder('users')
+      .select(['users.id', 'users.login'])
       .getMany();
     return users;
   };
@@ -49,9 +49,9 @@ export class UsersService {
 
   async findById(id: string): Promise<UserEntity> {
     const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where('user.id = :id', { id })
-      .select(['user.id', 'user.login'])
+      .createQueryBuilder('users')
+      .where('users.id = :id', { id })
+      .select(['users.id', 'users.login'])
       .getOne();
 
     if (!user) {
@@ -69,9 +69,9 @@ export class UsersService {
   */
   async findByLogin(login: string): Promise<UserEntity> {
     const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where('user.login = :login', { login })
-      .select(['user.id', 'user.login', 'user.password'])
+      .createQueryBuilder('users')
+      .where('users.login = :login', { login })
+      .select(['users.id', 'users.login', 'users.password'])
       .getOne();
 
     if (!user) {
