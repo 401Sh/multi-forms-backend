@@ -85,8 +85,6 @@ export class UsersService {
 
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    UsersService.logger.log(`Updating user with id: ${id}`);
-
     // Check user
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
@@ -116,7 +114,6 @@ export class UsersService {
 
   async deleteById(id: string): Promise<DeleteResult> {
     UsersService.logger.log(`Deleting user with id: ${id}`);
-
     const deleteResult = await this.userRepository.delete({ id: id });
 
     if (deleteResult.affected === 0) {

@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import * as cookieParser from 'cookie-parser';
-import { Logger, LogLevel } from '@nestjs/common';
+import { Logger, LogLevel, ValidationPipe } from '@nestjs/common';
 
 dotenv.config();
 
@@ -17,6 +17,13 @@ async function bootstrap() {
 
   app.useLogger(logLevels);
   app.use(cookieParser());
+
+  // Enable global validation
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,         // Ensures that the body is transformed into the DTO
+    whitelist: true,         // Removes properties not decorated with validation decorators
+    forbidNonWhitelisted: true, // Throws an error if extra properties are provided
+  }));
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Multi forms backend API')

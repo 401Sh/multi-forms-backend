@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, UseGuards, Request, Delete, HttpStatus, Patch, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, UseGuards, Request, Delete, HttpStatus, Patch, Res, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
@@ -28,7 +28,7 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @Get(':id')
-  async getOne(@Param('id') id: string) {
+  async getOne(@Param('id', ParseUUIDPipe) id: string) {
     return await this.usersService.findById(id);
   };
 
