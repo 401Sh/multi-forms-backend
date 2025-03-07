@@ -18,10 +18,10 @@ export class SurveyEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  name!: string;
+  @Column({ type: 'varchar', length: 255, default: 'Новый опрос' })
+  name: string;
 
-  @Column({ type: 'varchar', length: 512 })
+  @Column({ type: 'varchar', length: 512, default: '' })
   description: string;
 
   @Column({ type: 'bool', default: false })
@@ -30,7 +30,7 @@ export class SurveyEntity extends BaseEntity {
   @Column({ type: 'enum', enum: SurveyAccess, default: SurveyAccess.PUBLIC })
   access: SurveyAccess;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', default: 0 })
   totalPoints: number;
 
   @CreateDateColumn()

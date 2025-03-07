@@ -12,6 +12,14 @@ export class SurveysController {
 
 
   @UseGuards(AccessTokenGuard)
+  @Post()
+  async postSurvey(@Request() req) {
+    const userId = req.user['sub'];
+    return await this.surveysService.createSurvey(userId);
+  };
+
+
+  @UseGuards(AccessTokenGuard)
   @Get('me')
   async getMe(
     @Request() req,
@@ -27,7 +35,7 @@ export class SurveysController {
   async getPublic(@Query() query: GetSurveysQueryDto) {
     return await this.surveysService.findSurveys(
       query,
-      { access: SurveyAccess.PUBLIC }
+      { access: SurveyAccess.PUBLIC, isPublished: true }
     );
   };
 
