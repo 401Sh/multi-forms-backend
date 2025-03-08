@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SurveyEntity } from './entities/survey.entity';
 import { Repository } from 'typeorm';
@@ -21,13 +21,32 @@ export class SurveysService {
   ) {}
 
 
-  async createSurvey(id: string) {
+  async createSurvey(id: string): Promise<SurveyEntity> {
     const survey = this.surveyRepository.save({
       user: { id },
     })
 
     SurveysService.logger.log(`Created new survey for user: ${id}`);
     return survey
+  };
+
+
+  async findById(id: string, userId: string): Promise<SurveyEntity> {
+    const survey = await this.surveyRepository
+      .createQueryBuilder("surveys")
+      .leftJoinAndSelect("surveys.questions", "questions")
+      .leftJoinAndSelect("questions.questionOptions", "questionOptions")
+      .where("surveys.id = :id", { id })
+      .andWhere("surveys.userId = :userId", { userId: userId })
+      .getOne();
+
+    if (!survey) {
+      SurveysService.logger.log(`No survey with id: ${id}`);
+      throw new BadRequestException('Survey does not exist');
+    };
+
+    SurveysService.logger.log(`Finded survey with id: ${id}`);
+    return survey;
   };
 
 
@@ -47,13 +66,13 @@ export class SurveysService {
     // Access filtration
     if (options?.access) {
       log_message += ` with access option ${options.access}`;
-      queryBuilder.where('surveys.access = :access', { access: options.access });
+      queryBuilder.andWhere('surveys.access = :access', { access: options.access });
     };
 
     // Published filtration
     if (options?.isPublished) {
       log_message += ` published - ${options.isPublished}`;
-      queryBuilder.where(
+      queryBuilder.andWhere(
         'surveys.isPublished = :isPublished',
         { isPublished: options.isPublished }
       );

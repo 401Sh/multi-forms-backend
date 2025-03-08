@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request, Query, Post } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Query, Post, ParseUUIDPipe, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { SurveysService } from './surveys.service';
@@ -40,9 +40,13 @@ export class SurveysController {
   };
 
 
-  // @UseGuards(AccessTokenGuard)
-  // @Get(':id')
-  // async getOne(@Param('id', ParseUUIDPipe) id: string) {
-  //   return await this.surveysService.findById(id);
-  // };
+  @UseGuards(AccessTokenGuard)
+  @Get('me/:id')
+  async getOne(
+    @Request() req,
+    @Param('id', ParseUUIDPipe) id: string
+  ) {
+    const userId = req.user['sub'];
+    return await this.surveysService.findById(id, userId);
+  };
 };
