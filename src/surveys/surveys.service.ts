@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SurveyEntity } from './entities/survey.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { GetSurveysQueryDto } from './dto/get-surveys-query.dto';
 import { SurveyAccess } from './entities/survey.enum';
+import { UpdateSurveyDto } from './dto/update-survey.dto';
 
 type SurveyOptions = {
   userId?: string,
@@ -24,10 +25,10 @@ export class SurveysService {
   async createSurvey(id: string): Promise<SurveyEntity> {
     const survey = this.surveyRepository.save({
       user: { id },
-    })
+    });
 
     SurveysService.logger.log(`Created new survey for user: ${id}`);
-    return survey
+    return survey;
   };
 
 
@@ -128,5 +129,29 @@ export class SurveysService {
       currentPage: page,
       totalPages: Math.ceil(totalSurveys / pageSize),
     };
+  };
+
+
+  async update(id: string, userId: string, UpdateSurveyDto: UpdateSurveyDto) {
+    SurveysService.logger.log(`Updating survey with id: ${id}`);
+    await this.surveyRepository.update({ id: id }, UpdateSurveyDto);
+
+    const updatedSurvey = await this.surveyRepository.findOne({ where: { id } });
+    return updatedSurvey;
+  }
+
+
+  async deleteById(id: string, userId: string): Promise<DeleteResult> {
+    SurveysService.logger.log(`Deleting survey with id: ${id}`);
+    const deleteResult = await this.surveyRepository.delete(
+      { id: id, user: { id: userId } }
+    );
+
+    if (deleteResult.affected === 0) {
+      SurveysService.logger.log(`Cannot delete survey. No survey with id: ${id}`);
+      throw new NotFoundException(`Survey with id ${id} not found`);
+    };
+
+    return deleteResult;
   };
 };
