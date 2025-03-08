@@ -18,7 +18,7 @@ export class SurveysService {
 
   constructor(
     @InjectRepository(SurveyEntity)
-    private surveyRepository: Repository<SurveyEntity>,
+    private surveyRepository: Repository<SurveyEntity>
   ) {}
 
 
@@ -32,13 +32,19 @@ export class SurveysService {
   };
 
 
-  async findById(id: string, userId: string): Promise<SurveyEntity> {
+  async findById(id: string): Promise<SurveyEntity> {
     const survey = await this.surveyRepository
       .createQueryBuilder("surveys")
       .leftJoinAndSelect("surveys.questions", "questions")
       .leftJoinAndSelect("questions.questionOptions", "questionOptions")
+      .leftJoin("surveys.user", "user")
       .where("surveys.id = :id", { id })
-      .andWhere("surveys.userId = :userId", { userId: userId })
+      .select([
+        "surveys",
+        "questions",
+        "questionOptions",
+        "user.id",
+      ])
       .getOne();
 
     if (!survey) {
@@ -132,7 +138,7 @@ export class SurveysService {
   };
 
 
-  async update(id: string, userId: string, UpdateSurveyDto: UpdateSurveyDto) {
+  async update(id: string, UpdateSurveyDto: UpdateSurveyDto) {
     SurveysService.logger.log(`Updating survey with id: ${id}`);
     await this.surveyRepository.update({ id: id }, UpdateSurveyDto);
 
@@ -141,11 +147,9 @@ export class SurveysService {
   }
 
 
-  async deleteById(id: string, userId: string): Promise<DeleteResult> {
+  async deleteById(id: string): Promise<DeleteResult> {
     SurveysService.logger.log(`Deleting survey with id: ${id}`);
-    const deleteResult = await this.surveyRepository.delete(
-      { id: id, user: { id: userId } }
-    );
+    const deleteResult = await this.surveyRepository.delete({ id: id });
 
     if (deleteResult.affected === 0) {
       SurveysService.logger.log(`Cannot delete survey. No survey with id: ${id}`);

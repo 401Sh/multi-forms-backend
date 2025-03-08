@@ -6,6 +6,7 @@ import { GetSurveysQueryDto } from './dto/get-surveys-query.dto';
 import { SurveyAccess } from './entities/survey.enum';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { Response } from 'express';
+import { SurveyOwnerGuard } from 'src/guards/survey-owner.guards';
 
 @ApiTags('surveys')
 @Controller('surveys')
@@ -42,38 +43,32 @@ export class SurveysController {
   };
 
 
-  @UseGuards(AccessTokenGuard)
-  @Get('me/:id')
+  @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
+  @Get('me/:surveyId')
   async findMySurveyById(
-    @Request() req,
-    @Param('id', ParseUUIDPipe) id: string
+    @Param('surveyId', ParseUUIDPipe) surveyId: string
   ) {
-    const userId = req.user['sub'];
-    return await this.surveysService.findById(id, userId);
+    return await this.surveysService.findById(surveyId);
   };
 
 
-  @UseGuards(AccessTokenGuard)
-  @Patch('me/:id')
+  @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
+  @Patch('me/:surveyId')
   async updateMySurvey(
-    @Request() req,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('surveyId', ParseUUIDPipe) surveyId: string,
     @Body() data: UpdateSurveyDto
   ) {
-    const userId = req.user['sub'];
-    return await this.surveysService.update(id, userId, data);
+    return await this.surveysService.update(surveyId, data);
   };
 
 
-  @UseGuards(AccessTokenGuard)
-  @Delete('me/:id')
+  @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
+  @Delete('me/:surveyId')
   async deleteMySurvey(
-    @Request() req,
     @Res() res: Response,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('surveyId', ParseUUIDPipe) surveyId: string,
   ) {
-    const userId = req.user['sub'];
-    await this.surveysService.deleteById(id, userId);
+    await this.surveysService.deleteById(surveyId);
     return res.send({ message: 'Survey deleted successfully', statusCode: 204 });
   };
 };
