@@ -15,7 +15,7 @@ export class SurveysController {
 
   @UseGuards(AccessTokenGuard)
   @Post()
-  async postSurvey(@Request() req) {
+  async create(@Request() req) {
     const userId = req.user['sub'];
     return await this.surveysService.createSurvey(userId);
   };
@@ -23,7 +23,7 @@ export class SurveysController {
 
   @UseGuards(AccessTokenGuard)
   @Get('me')
-  async getMe(
+  async findMySurveys(
     @Request() req,
     @Query() query: GetSurveysQueryDto
   ) {
@@ -34,7 +34,7 @@ export class SurveysController {
 
   // No 'private' or 'all' route in terms of privacy
   @Get('public')
-  async getPublic(@Query() query: GetSurveysQueryDto) {
+  async findPublicSurveys(@Query() query: GetSurveysQueryDto) {
     return await this.surveysService.findSurveys(
       query,
       { access: SurveyAccess.PUBLIC, isPublished: true }
@@ -44,7 +44,7 @@ export class SurveysController {
 
   @UseGuards(AccessTokenGuard)
   @Get('me/:id')
-  async getOne(
+  async findMySurveyById(
     @Request() req,
     @Param('id', ParseUUIDPipe) id: string
   ) {
@@ -55,7 +55,7 @@ export class SurveysController {
 
   @UseGuards(AccessTokenGuard)
   @Patch('me/:id')
-  async patchOne(
+  async updateMySurvey(
     @Request() req,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() data: UpdateSurveyDto
@@ -67,7 +67,7 @@ export class SurveysController {
 
   @UseGuards(AccessTokenGuard)
   @Delete('me/:id')
-  async deleteOne(
+  async deleteMySurvey(
     @Request() req,
     @Res() res: Response,
     @Param('id', ParseUUIDPipe) id: string,

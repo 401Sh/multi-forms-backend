@@ -13,7 +13,7 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @Get('me')
-  async getMe(@Request() req) {
+  async findMe(@Request() req) {
     const userId = req.user['sub'];
     return await this.usersService.findById(userId);
   };
@@ -21,14 +21,14 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @Get('all')
-  async getAll() {
+  async findAll() {
     return await this.usersService.findAll();
   };
 
 
   @UseGuards(AccessTokenGuard)
   @Get(':id')
-  async getOne(@Param('id', ParseUUIDPipe) id: string) {
+  async findById(@Param('id', ParseUUIDPipe) id: string) {
     return await this.usersService.findById(id);
   };
 
