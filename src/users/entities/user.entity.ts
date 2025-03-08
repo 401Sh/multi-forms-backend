@@ -16,10 +16,10 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
   login!: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   password!: string;
 
   @CreateDateColumn()

@@ -14,17 +14,17 @@ export class QuestionOptionEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', nullable: false })
   position!: number;
 
   @Column({ type: 'bool', default: false })
-  isCorrect: boolean;
+  isCorrect: boolean = false;
 
   @Column({ type: 'integer', default: 0 })
-  points: number;
+  points: number = 0;
 
-  @Column({ type: 'varchar', length: 512 })
-  text: string;
+  @Column({ type: 'varchar', length: 512, nullable: false })
+  text!: string;
   
   @OneToMany(
     () => AnswerOptionEntity,

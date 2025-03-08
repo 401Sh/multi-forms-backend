@@ -17,10 +17,10 @@ export class RespondentEntity extends BaseEntity {
   id: string;
 
   @Column({ type: 'integer', default: 0 })
-  score: number;
+  score: number = 0;
 
-  @Column({ type: 'integer' })
-  totalPoints: number;
+  @Column({ type: 'integer', default: 0 })
+  totalPoints: number = 0;
 
   @CreateDateColumn()
   createdAt: Date;
