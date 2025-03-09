@@ -130,3 +130,8 @@ package.json
 - protected(accesstoken)   **PATCH  /surveys/:surveyId**   - Обновление своей анкеты
 - protected(accesstoken)   **DELETE /surveys/:surveyId**   - Удаление своей анкеты
 
+### Модуль questions
+
+- protected(accesstoken)   **POST   /surveys/:surveyId/questions/**            - Создание нового вопроса в анкете
+- protected(accesstoken)   **PATCH  /surveys/:surveyId/questions/:questionId** - Обновление данных вопроса
+- protected(accesstoken)   **DELETE /surveys/:surveyId/questions/:questionId** - Удаление вопроса
