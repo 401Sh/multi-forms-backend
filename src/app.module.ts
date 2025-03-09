@@ -7,7 +7,7 @@ import { dataSourceOptions } from 'database/db-source';
 import { ConfigModule } from '@nestjs/config';
 import { SurveysModule } from './surveys/surveys.module';
 import { RespondentsModule } from './respondents/respondents.module';
-import { AuthsModule } from './auths/auths.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { AuthsModule } from './auths/auths.module';
     UsersModule,
     SurveysModule,
     RespondentsModule,
-    AuthsModule],
+    AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

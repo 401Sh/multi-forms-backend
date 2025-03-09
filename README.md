@@ -1,4 +1,4 @@
-# Multi page forms backend - NestJS + TypeScript + TypeORM
+# Multi page forms backend - NestJS + TypeScript + TypeORM + JWT
 
 ## Цель проекта
 
@@ -77,7 +77,7 @@ src/
 │
 │── database/           # Файлы настройки базы данных
 │
-│── auths/              # Модуль аунтентификации и авторизации
+│── auth/              # Модуль аунтентификации и авторизации
 │   ├── dto
 │   ├── entities/       # Сущности модуля аунтентификации и авторизации
 │   ├── strategies      # Стратегии валидации токенов
@@ -103,3 +103,30 @@ src/
 tsconfig.json
 package.json
 ```
+
+## Используемые роуты
+
+### Модуль users
+
+- protected(accesstoken) **GET    /users/self**            - Получение своих данных
+- protected(accesstoken) **GET    /users/**                - Получение списка пользователей
+- protected(accesstoken) **GET    /users/:userId**         - Получение данных конкретного пользователя
+- protected(accesstoken) **PATCH  /users/self**            - Обновление своих данных
+- protected(accesstoken) **DELETE /users/self**            - Удаление своего аккаунта
+
+### Модуль auth
+
+- POST                     **/auth/signup**        - Регистрация
+- POST                     **/auth/signin**        - Авторизация
+- protected(accesstoken)   **POST  /auth/logout**  - Удаление сессии
+- protected(refreshtoken)  **POST  /auth/refresh** - Обновление токенов
+
+### Модуль surveys
+
+- protected(accesstoken)   **POST   /surveys/**            - Создание новой анкеты
+- protected(accesstoken)   **GET    /surveys/self**        - Получение своих анкет
+- GET                      **/surveys/public**             - Просмотр публичных анкет
+- protected(accesstoken)   **GET    /surveys/:surveyId**   - Получение данных своей анкеты
+- protected(accesstoken)   **PATCH  /surveys/:surveyId**   - Обновление своей анкеты
+- protected(accesstoken)   **DELETE /surveys/:surveyId**   - Удаление своей анкеты
+

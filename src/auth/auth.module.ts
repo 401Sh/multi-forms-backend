@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AuthsController } from './auths.controller';
-import { AuthsService } from './auths.service';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshSessionEntity } from './entities/refresh-session.entity';
 import { AccessTokenStrategy } from './strategies/accessToken.strategy';
@@ -14,7 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
     UsersModule,
     JwtModule.register({})
   ],
-  controllers: [AuthsController],
-  providers: [AuthsService, AccessTokenStrategy, RefreshTokenStrategy]
+  controllers: [AuthController],
+  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy]
 })
-export class AuthsModule {}
+export class AuthModule {}

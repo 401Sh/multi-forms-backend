@@ -20,7 +20,10 @@
   "keywords": [
     "nestjs",
     "jwt",
-    "form"
+    "form",
+    "passport-jwt",
+    "typeorm",
+    "typescript"
   ],
   "author": "401Sh",
   "license": "ISC",

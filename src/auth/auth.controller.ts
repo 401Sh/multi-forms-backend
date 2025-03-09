@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Ip, Post, Headers, Request, UseGuards, Res } from '@nestjs/common';
+import { Body, Controller, Ip, Post, Headers, Request, UseGuards, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthsService } from './auths.service';
+import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthDto } from './dto/auth.dto';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
@@ -8,10 +8,10 @@ import { RefreshTokenGuard } from 'src/guards/refreshToken.guard';
 import { Response } from 'express';
 import { refreshCookieOptions } from 'src/configs/cookie.config';
 
-@ApiTags('auths')
-@Controller('auths')
-export class AuthsController {
-  constructor(private authService: AuthsService) {}
+@ApiTags('auth')
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
 
   @Post('signup')
   async signup(
@@ -50,7 +50,7 @@ export class AuthsController {
 
   
   @UseGuards(AccessTokenGuard)
-  @Get('logout')
+  @Post('logout')
   async logout(
     @Headers('x-fingerprint') fingerprint: string,
     @Request() req,
@@ -64,7 +64,7 @@ export class AuthsController {
 
 
   @UseGuards(RefreshTokenGuard)
-  @Get('refresh')
+  @Post('refresh')
   async refreshTokens(
     @Request() req,
     @Headers('user-agent') userAgent: string,

@@ -23,7 +23,7 @@ export class SurveysController {
 
 
   @UseGuards(AccessTokenGuard)
-  @Get('me')
+  @Get('self')
   async findMySurveys(
     @Request() req,
     @Query() query: GetSurveysQueryDto
@@ -44,7 +44,7 @@ export class SurveysController {
 
 
   @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
-  @Get('me/:surveyId')
+  @Get(':surveyId')
   async findMySurveyById(
     @Param('surveyId', ParseUUIDPipe) surveyId: string
   ) {
@@ -53,7 +53,7 @@ export class SurveysController {
 
 
   @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
-  @Patch('me/:surveyId')
+  @Patch(':surveyId')
   async updateMySurvey(
     @Param('surveyId', ParseUUIDPipe) surveyId: string,
     @Body() data: UpdateSurveyDto
@@ -63,7 +63,7 @@ export class SurveysController {
 
 
   @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
-  @Delete('me/:surveyId')
+  @Delete(':surveyId')
   async deleteMySurvey(
     @Res() res: Response,
     @Param('surveyId', ParseUUIDPipe) surveyId: string,

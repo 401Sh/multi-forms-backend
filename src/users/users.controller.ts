@@ -12,7 +12,14 @@ export class UsersController {
 
 
   @UseGuards(AccessTokenGuard)
-  @Get('me')
+  @Get('')
+  async findAll() {
+    return await this.usersService.findAll();
+  };
+  
+
+  @UseGuards(AccessTokenGuard)
+  @Get('self')
   async findMe(@Request() req) {
     const userId = req.user['sub'];
     return await this.usersService.findById(userId);
@@ -20,21 +27,14 @@ export class UsersController {
 
 
   @UseGuards(AccessTokenGuard)
-  @Get('all')
-  async findAll() {
-    return await this.usersService.findAll();
+  @Get(':userId')
+  async findById(@Param('userId', ParseUUIDPipe) userId: string) {
+    return await this.usersService.findById(userId);
   };
 
 
   @UseGuards(AccessTokenGuard)
-  @Get(':id')
-  async findById(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.usersService.findById(id);
-  };
-
-
-  @UseGuards(AccessTokenGuard)
-  @Patch('me')
+  @Patch('self')
   async updateMe(
     @Body() updateUserDto: UpdateUserDto,
     @Request() req
@@ -51,7 +51,7 @@ export class UsersController {
 
 
   @UseGuards(AccessTokenGuard)
-  @Delete('me')
+  @Delete('self')
   async deleteMe(
     @Request() req,
     @Res() res: Response

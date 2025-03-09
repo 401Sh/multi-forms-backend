@@ -1,4 +1,4 @@
-import { RefreshSessionEntity } from 'src/auths/entities/refresh-session.entity';
+import { RefreshSessionEntity } from 'src/auth/entities/refresh-session.entity';
 import { RespondentEntity } from 'src/respondents/entities/respondent.entity';
 import { SurveyEntity } from 'src/surveys/entities/survey.entity';
 import { 

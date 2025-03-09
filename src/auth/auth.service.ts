@@ -12,8 +12,8 @@ import { AuthDto } from './dto/auth.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
-export class AuthsService {
-  private static readonly logger = new Logger(AuthsService.name);
+export class AuthService {
+  private static readonly logger = new Logger(AuthService.name);
 
   constructor(
     @InjectRepository(RefreshSessionEntity)
@@ -78,11 +78,11 @@ export class AuthsService {
   async logout(userId: string, fp: string) {
     const user = await this.usersService.findById(userId);
     if (!user) {
-      AuthsService.logger.error(`User with id: ${userId} - not found`);
+      AuthService.logger.error(`User with id: ${userId} - not found`);
       throw new Error('User not found');
     };
 
-    AuthsService.logger.log(`Deleting user ${userId} session`);
+    AuthService.logger.log(`Deleting user ${userId} session`);
     return this.refreshSessionRepository.delete({ user: { id: user.id }, fingerprint: fp });
   };
 
@@ -109,7 +109,7 @@ export class AuthsService {
     const hashedRefreshToken = await this.hashData(refreshToken);
 
     const refreshTokenTTL = this.configService.get<string>('REFRESH_TOKEN_TTL') || '3d'
-    const ttl = AuthsService.parseTTL(refreshTokenTTL);
+    const ttl = AuthService.parseTTL(refreshTokenTTL);
 
     this.refreshSessionRepository.save({
       user,
@@ -132,7 +132,7 @@ export class AuthsService {
     const user = await this.usersService.findById(userId);
     
     if (!user) {
-      AuthsService.logger.log(`Access denied for user id: ${userId}. No such user`);
+      AuthService.logger.log(`Access denied for user id: ${userId}. No such user`);
       throw new ForbiddenException('Access Denied');
     };
 
@@ -140,7 +140,7 @@ export class AuthsService {
     const session = await this.findRefreshSession(user, fingerprint);
 
     if (!session) {
-      AuthsService.logger.log(`Access denied for user: ${user.id}. No existing session`);
+      AuthService.logger.log(`Access denied for user: ${user.id}. No existing session`);
       throw new ForbiddenException('Access Denied');
     };
 
@@ -149,7 +149,7 @@ export class AuthsService {
     console.log(currentTime)
     console.log(session.expiresAt)
     if (session.expiresAt < currentTime) {
-      AuthsService.logger.log(`Access denied for user: ${user.id}. Refresh token expired`);
+      AuthService.logger.log(`Access denied for user: ${user.id}. Refresh token expired`);
       throw new ForbiddenException('Refresh token expired');
     }
 
@@ -159,7 +159,7 @@ export class AuthsService {
     );
 
     if (!refreshTokenMatches) {
-      AuthsService.logger.log(`Access denied for user: ${user.id}. Incorrect refresh token`);
+      AuthService.logger.log(`Access denied for user: ${user.id}. Incorrect refresh token`);
       throw new ForbiddenException('Access Denied');
     };
 
@@ -175,7 +175,7 @@ export class AuthsService {
 
     this.deleteRefreshSession(user, fingerprint);
 
-    AuthsService.logger.debug(`Created new jwt tokens for user ${user.id}`);
+    AuthService.logger.debug(`Created new jwt tokens for user ${user.id}`);
     return tokens;
   };
 
@@ -187,7 +187,7 @@ export class AuthsService {
       }
     );
 
-    AuthsService.logger.log(`Finded session for user id: ${user.id}`);
+    AuthService.logger.log(`Finded session for user id: ${user.id}`);
     return session;
   };
 
@@ -198,7 +198,7 @@ export class AuthsService {
 
     if (!accessSecret || !refreshSecret){
       console.log(accessSecret)
-      AuthsService.logger.error(`Access/Refresh token secret - not found in env`);
+      AuthService.logger.error(`Access/Refresh token secret - not found in env`);
       throw new Error('No access or refresh token secret');
     }
 
@@ -237,7 +237,7 @@ export class AuthsService {
 
 
   async deleteRefreshSession(user: UserEntity, fp: string){
-    AuthsService.logger.debug(`Deleting session of user id: ${user.id}`);
+    AuthService.logger.debug(`Deleting session of user id: ${user.id}`);
     return this.refreshSessionRepository.delete({ user: { id: user.id }, fingerprint: fp });
   }
 
@@ -259,7 +259,7 @@ export class AuthsService {
         expirationDate = addMinutes(expirationDate, ttlValue);
         break;
       default:
-        AuthsService.logger.error('Invalid TTL format');
+        AuthService.logger.error('Invalid TTL format');
         throw new Error('Invalid TTL format');
     };
 
