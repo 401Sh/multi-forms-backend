@@ -22,15 +22,14 @@ export class QuestionsController {
   };
 
 
-  // @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
-  // @Patch(':questionId')
-  // async updateById(
-  //   @Param('surveyId', ParseUUIDPipe) surveyId: string,
-  //   @Param('questionId', ParseUUIDPipe) questionId: string,
-  //   @Body() data: UpdateQuestionDto
-  // ) {
-    
-  // };
+  @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
+  @Patch(':questionId')
+  async updateById(
+    @Param('questionId', ParseUUIDPipe) questionId: string,
+    @Body() data: UpdateQuestionDto
+  ) {
+    return await this.questionsService.updateQuestionTransaction(questionId, data)
+  };
 
 
   @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
