@@ -18,7 +18,7 @@ export class QuestionsController {
     @Param('surveyId', ParseUUIDPipe) surveyId: string,
     @Body() data: CreateQuestionDto
   ) {
-    return await this.questionsService.createQuestion(surveyId, data);
+    return await this.questionsService.createQuestionTransaction(surveyId, data);
   };
 
 

@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { QuestionEntity } from './entities/question.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,43 +14,70 @@ export class QuestionsService {
   private static readonly logger = new Logger(QuestionsService.name);
   
   constructor(
-    @InjectRepository(SurveyEntity)
-    private surveyRepository: Repository<SurveyEntity>,
     @InjectRepository(QuestionEntity)
     private questionRepository: Repository<QuestionEntity>,
-    @InjectRepository(QuestionOptionEntity)
-    private questionOptionRepository: Repository<QuestionOptionEntity>,
 
     private readonly dataSource: DataSource
   ) {}
 
   
-  async createQuestion(surveyId: string, data: CreateQuestionDto) {
-    const survey = await this.surveyRepository.findOne(
-      { where: { id: surveyId } }
-    );
+  async createQuestionTransaction(surveyId: string, data: CreateQuestionDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    QuestionsService.logger.debug('Started Question create transaction');
 
-    if (!survey) {
-      QuestionsService.logger.debug(`Cannot create question for survey ${surveyId}. No such survey`);
-      throw new NotFoundException(`Survey not found`);
+    try {
+      const survey = await queryRunner.manager.findOne(
+        SurveyEntity,
+        { where: { id: surveyId } }
+      );
+  
+      if (!survey) {
+        QuestionsService.logger.debug(`Cannot create question for survey ${surveyId}. No such survey`);
+        throw new NotFoundException(`Survey not found`);
+      };
+
+      const position = await this.checkQuestionPosition(
+        queryRunner,
+        surveyId,
+        data.position
+      )
+  
+      const question = await queryRunner.manager.save(
+        QuestionEntity,
+        { survey: { id: survey.id }, ...data, position }
+      );
+      
+      await this.moveDownPositions(
+        queryRunner, survey.id, question.position
+      )
+  
+      if (data.type != QuestionType.TEXT) {
+        let questionOption = await queryRunner.manager.save(
+          QuestionOptionEntity,
+          {
+          question: { id: question.id },
+          position: 1,
+          text: 'Опция 1'
+          }
+        );
+  
+        question.questionOptions = [questionOption];
+      };
+  
+      await queryRunner.commitTransaction();
+      QuestionsService.logger.debug('Question create transaction has been successfully ended');
+
+      return question;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      QuestionsService.logger.debug('Question create transaction has failed and was rolled back');
+      QuestionsService.logger.error(`Question create transaction failed: ${error.message}`, error);
+      throw error;
+    } finally {
+      await queryRunner.release();
     };
-
-    let questionOption: QuestionOptionEntity | undefined = undefined;
-    if (data.type != QuestionType.TEXT) {
-      questionOption = await this.questionOptionRepository.save({
-        position: 1,
-        text: 'Опция 1'
-      });
-    };
-
-    const question = this.questionRepository.save({
-      survey: { id: survey.id },
-      ...data,
-      questionOptions: questionOption ? [questionOption] : []
-    });
-
-    QuestionsService.logger.debug(`Created new question for survey: ${surveyId}`);
-    return question;
   };
 
 
@@ -101,6 +128,10 @@ export class QuestionsService {
           newPoints = 0;
         }
       } else {
+        if (data.questionOptions) {
+          QuestionsService.logger.debug('Cannot update TEXT question. Incorrect data input');
+          throw new BadRequestException('TEXT Question cannot have options');
+        };
         newPoints = data.points;
       };
 
@@ -114,9 +145,14 @@ export class QuestionsService {
       // Update question data
       await this.updateQuestionData(queryRunner, question, data);
 
-      // Обновление позиций остальных вопросов через транзакцию
-      if (data.position !== undefined && data.position !== oldPosition) {
-        await this.reorderPositions(queryRunner, oldSurveyId, oldPosition, data.position);
+      // Update question position and move other questions
+      if (data.position !== undefined) {
+        const newPosition = await this.checkQuestionPosition(
+          queryRunner, question.survey.id, data.position
+        )
+        await this.reorderPositions(
+          queryRunner, oldSurveyId, oldPosition, newPosition
+        );
       };
 
       await queryRunner.commitTransaction();
@@ -172,19 +208,38 @@ export class QuestionsService {
     question: QuestionEntity,
     options: UpdateQuestionOptionDto[]
   ) {
+    // Maybe need to add automatic rearrangement
+    const positions = options.map(optionData => optionData.position);
+    const hasDuplicatePositions = new Set(positions).size !== positions.length;
+    if (hasDuplicatePositions) {
+      QuestionsService.logger.debug('Cannot create question options. Dublicated positions');
+      throw new BadRequestException('Question options cannot have duplicate positions');
+    }
+
+    if (question.type === QuestionType.RADIO) {
+      const correctOptionsCount = options.filter(option => option.isCorrect).length;
+      
+      if (correctOptionsCount > 1) {
+        QuestionsService.logger.debug(`Cannot update options in question ${question.id}. Radio can't have more than one correct answer`);
+        throw new BadRequestException('There can be only one correct option for a radio question');
+      }
+    }
+
     // Delete old options
     await queryRunner.manager.delete(
       QuestionOptionEntity, { question: { id: question.id } }
     );
 
     // Create new options
-    const newOptions = options.map((optionData) => ({
-      ...optionData,
-      isCorrect: optionData.isCorrect ?? false,
-      points: optionData.points ?? 0,
-      text: optionData.text ?? '',
-      question,
-    }));
+    const newOptions = options.map((optionData) => {
+      const newOption = new QuestionOptionEntity();
+      newOption.position = optionData.position;
+      newOption.isCorrect = optionData.isCorrect ?? false;
+      newOption.points = optionData.points ?? 0;
+      newOption.text = optionData.text ?? '';
+      newOption.question = question;
+      return newOption;
+    });
 
     // Save options
     await queryRunner.manager.save(newOptions);
@@ -231,7 +286,7 @@ export class QuestionsService {
     oldPosition: number,
     newPosition: number,
   ) {
-    if (oldPosition === newPosition || newPosition < 1) return;
+    if (oldPosition === newPosition) return;
 
     const moveUp = newPosition < oldPosition;
     const operator = moveUp ? '+1' : '-1';
@@ -267,5 +322,44 @@ export class QuestionsService {
     };
 
     return deleteResult;
+  };
+
+
+  private async moveDownPositions(
+    queryRunner: QueryRunner,
+    surveyId: string,
+    position: number,
+  ) {
+    const newPosition = position + 1
+    // Move down all questions
+    await queryRunner.manager
+      .createQueryBuilder()
+      .update(QuestionEntity)
+      .set({ position: () => 'position + 1' })
+      .where('surveyId = :surveyId', { surveyId })
+      .andWhere('position >= :newPosition', { newPosition })
+      .execute();
+  };
+
+
+  private async checkQuestionPosition(
+    queryRunner: QueryRunner,
+    surveyId: string,
+    newPosition: number
+  ) {
+    if (newPosition < 1) {
+      QuestionsService.logger.debug('Cannot create question. Negative position');
+      throw new BadRequestException('Question position cant be negative');
+    }
+
+    const maxPosition = await queryRunner.manager
+    .createQueryBuilder(QuestionEntity, 'question')
+    .select('MAX(question.position)', 'maxPosition')
+    .where('question.surveyId = :surveyId', { surveyId })
+    .getRawOne();
+
+    const position = newPosition > maxPosition.maxPosition
+      ? maxPosition.maxPosition + 1 : newPosition;
+    return position
   };
 };

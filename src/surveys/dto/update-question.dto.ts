@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsBoolean, IsInt, IsArray } from 'class-validator';
+import { IsOptional, IsString, IsBoolean, IsInt, IsArray, Min } from 'class-validator';
 import { UpdateQuestionOptionDto } from './update-question-option.dto';
 
 export class UpdateQuestionDto {
@@ -12,6 +12,7 @@ export class UpdateQuestionDto {
 
   @IsInt()
   @IsOptional()
+  @Min(1, { message: 'Position cannot be less than 1' })
   position: number;
 
   @IsString()
@@ -28,6 +29,7 @@ export class UpdateQuestionDto {
 
   @IsInt()
   @IsOptional()
+  @Min(0, { message: 'Points cannot be less than 0' })
   points: number;
 
   @IsArray()

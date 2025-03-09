@@ -17,8 +17,4 @@ export class UpdateSurveyDto {
   @IsEnum(SurveyAccess)
   @IsOptional()
   access: SurveyAccess;
-
-  @IsNumber()
-  @IsOptional()
-  totalPoints: number;
 }

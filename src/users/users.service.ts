@@ -15,6 +15,7 @@ export class UsersService {
     private userRepository: Repository<UserEntity>
   ) {}
 
+  
   async create(createUserDto: CreateUserDto): Promise<UserEntity>{
     const isAvailable = await this.isLoginAvailable(createUserDto.login);
     if (!isAvailable) {
@@ -40,7 +41,7 @@ export class UsersService {
     UsersService.logger.log(`Finding all users`);
     const users = await this.userRepository
       .createQueryBuilder('users')
-      .select(['users.id', 'users.login'])
+      .select(['users.login'])
       .getMany();
     return users;
   };
@@ -51,7 +52,7 @@ export class UsersService {
     const user = await this.userRepository
       .createQueryBuilder('users')
       .where('users.id = :id', { id })
-      .select(['users.id', 'users.login'])
+      .select(['users.login'])
       .getOne();
 
     if (!user) {

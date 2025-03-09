@@ -5,6 +5,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import { GetSurveysQueryDto } from './dto/get-surveys-query.dto';
 import { SurveyAccess } from './entities/survey.enum';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
+import { UsersService } from 'src/users/users.service';
 
 type SurveyOptions = {
   userId?: string,
@@ -18,13 +19,17 @@ export class SurveysService {
 
   constructor(
     @InjectRepository(SurveyEntity)
-    private surveyRepository: Repository<SurveyEntity>
+    private surveyRepository: Repository<SurveyEntity>,
+
+    private usersService: UsersService
   ) {}
 
 
   async createSurvey(id: string): Promise<SurveyEntity> {
-    const survey = this.surveyRepository.save({
-      user: { id },
+    const user = await this.usersService.findById(id)
+
+    const survey = await this.surveyRepository.save({
+      user: user,
     });
 
     SurveysService.logger.log(`Created new survey for user: ${id}`);

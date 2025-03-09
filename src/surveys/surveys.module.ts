@@ -7,13 +7,17 @@ import { QuestionEntity } from './entities/question.entity';
 import { QuestionOptionEntity } from './entities/question-option.entity';
 import { QuestionsController } from './questions.controller';
 import { QuestionsService } from './questions.service';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([
-    SurveyEntity,
-    QuestionEntity,
-    QuestionOptionEntity
-  ])],
+  imports: [
+    TypeOrmModule.forFeature([
+      SurveyEntity,
+      QuestionEntity,
+      QuestionOptionEntity
+    ]),
+    UsersModule
+  ],
   providers: [SurveysService, QuestionsService],
   controllers: [SurveysController, QuestionsController]
 })
