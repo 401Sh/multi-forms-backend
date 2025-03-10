@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ResponsesService } from './response.service';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { SurveyOwnerGuard } from 'src/guards/survey-owner.guards';
+import { CreateResponseDto } from './dto/create-response.dto';
 
 @ApiTags('responses')
 @Controller('surveys/:surveyId')
@@ -28,14 +29,14 @@ export class ResponsesController {
   };
 
 
-  // @UseGuards(AccessTokenGuard)
-  // @Post()
-  // async create(
-  //   @Request() req,
-  //   @Param('surveyId', ParseUUIDPipe) surveyId: string,
-  //   @Body() data: CreateResponseDto
-  // ) {
-  //   const userId = req.user['sub'];
-  //   return await this.responsesService.create(surveyId, userId, data);
-  // };
+  @UseGuards(AccessTokenGuard)
+  @Post('responses')
+  async create(
+    @Request() req,
+    @Param('surveyId', ParseUUIDPipe) surveyId: string,
+    @Body() data: CreateResponseDto
+  ) {
+    const userId = req.user['sub'];
+    return await this.responsesService.create(surveyId, userId, data);
+  };
 };

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { DataSource, In, QueryRunner, Repository } from 'typeorm';
 import { QuestionEntity } from './entities/question.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateQuestionDto } from './dto/create-question.dto';
@@ -362,4 +362,13 @@ export class QuestionsService {
       ? maxPosition.maxPosition + 1 : newPosition;
     return position
   };
+
+  async findQuestionsByIds(questionIds: string[]) {
+    const questions = await this.questionRepository.find({
+      where: { id: In(questionIds) },
+      relations: ['questionOptions'] // Загружаем опции вопросов
+    });
+
+    return questions;
+  }
 };

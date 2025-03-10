@@ -5,6 +5,13 @@ import { Repository } from 'typeorm';
 import { CreateResponseDto } from './dto/create-response.dto';
 import { SurveysService } from 'src/surveys/surveys.service';
 import { omit } from 'lodash';
+import { CreateAnswerDto } from './dto/create-answer.dto';
+import { AnswerEntity } from './entities/answer.entity';
+import { QuestionsService } from 'src/questions/questions.service';
+import { QuestionOptionEntity } from 'src/questions/entities/question-option.entity';
+import { QuestionEntity } from 'src/questions/entities/question.entity';
+import { QuestionType } from 'src/questions/enums/question.enum';
+import { AnswerOptionEntity } from './entities/answer-option.entity';
 
 @Injectable()
 export class ResponsesService {
@@ -13,8 +20,13 @@ export class ResponsesService {
   constructor(
     @InjectRepository(ResponseEntity)
     private responseRepository: Repository<ResponseEntity>,
+    @InjectRepository(AnswerEntity)
+    private answerRepository: Repository<AnswerEntity>,
+    @InjectRepository(AnswerOptionEntity)
+    private answerOptionRepository: Repository<AnswerOptionEntity>,
 
     private surveysService: SurveysService,
+    private questionsService: QuestionsService
   ) {}
 
 
@@ -27,14 +39,93 @@ export class ResponsesService {
     };
 
     // return form;
-    // temporary solution - typeorm ignores select option in query builder
+    // temporary solution - typeorm for some reasons ignores select option in query builder
     return omit(form, ['access', 'questions.answer', 'questions.questionOptions.isCorrect']);
   };
 
 
-  // async create(surveyId: string, userId: string, data: CreateResponseDto) {
+  // Abomination function - needs to rework
+  async create(surveyId: string, userId: string, data: CreateResponseDto) {
+    const questionIds = data.answers.map(d => d.questionId);
+    const questions = await this.questionsService.findQuestionsByIds(questionIds);
+    const survey = await this.surveysService.findById(surveyId);
+    
+    const response = this.responseRepository.create({
+      survey: { id: surveyId },
+      user: { id: userId },
+      totalPoints: survey.totalPoints,
+      score: 0
+    });
+    await this.responseRepository.save(response);
 
-  // };
+    const { createdAnswers, score } = await this.createAnswersAndCalcScore(response, questions, data.answers);
+
+    response.answers = createdAnswers;
+    response.score = score;
+
+    return this.responseRepository.save(response);
+  };
+
+
+  // Abomination function - needs to rework
+  private async createAnswersAndCalcScore(response: ResponseEntity, questions: QuestionEntity[], data: CreateAnswerDto[]) {
+    let score = 0;
+    const answers: AnswerEntity[] = [];
+
+    for (const d of data) {
+      const question = questions.find(q => q.id === d.questionId);
+      if (!question) continue;
+
+      const answer = this.answerRepository.create({
+        response,
+        question: { id: question.id } as QuestionEntity,
+        answerText: question.type === QuestionType.TEXT ? d.answerText : undefined
+      });
+
+      if (question.type === QuestionType.TEXT) {
+        if (question.answer === d.answerText) {
+          score += question.points;
+        };
+      } else {
+        await this.answerRepository.save(answer);
+
+        const { createdAnswerOptions, additionalScore } = await this.createOptionsAndCalcScore(answer, d.answerOptions, question.questionOptions);
+        answer.answerOptions = createdAnswerOptions;
+        score += additionalScore;
+      };
+
+      await this.answerRepository.save(answer);
+      answers.push(answer);
+    };
+
+    return { createdAnswers: answers, score };
+  };
+
+
+  // Abomination function - needs to rework
+  private async createOptionsAndCalcScore(answer: AnswerEntity, data: string[], options: QuestionOptionEntity[]) {
+    let score = 0;
+    const answerOptions: AnswerOptionEntity[] = [];
+
+    for (const d of data) {
+      const option = options.find(o => o.id === d);
+      if (!option) continue;
+
+      const answerOption = this.answerOptionRepository.create({
+        answer: { id: answer.id },
+        questionOption: { id: option.id }
+      });
+
+      if (option.isCorrect) {
+        score += option.points;
+      };
+
+      await this.answerOptionRepository.save(answerOption);
+      answerOptions.push(answerOption);
+    };
+
+    return { createdAnswerOptions: answerOptions, additionalScore: score };
+  };
 
 
   async findResponses(surveyId: string) {

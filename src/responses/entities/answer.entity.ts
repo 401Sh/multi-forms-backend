@@ -15,7 +15,7 @@ export class AnswerEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 512, nullable: false })
+  @Column({ type: 'varchar', length: 512, nullable: true })
   answerText?: string;
 
   @ManyToOne(

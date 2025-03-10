@@ -9,7 +9,7 @@
 - [X] Регистрация и авторизация по JWT через логин и пароль
 - [X] Cоздание формы, поддерживающей поля: текстовое, radio, checkbox
 - [X] Получение, изменение и удаление формы по id
-- [ ] Отправка ответа на форму по id
+- [X] Отправка ответа на форму по id              <--- ***плохая реализация, необходимо переписать по возможности***
 - [X] Получение всех своих созданных форм
 - [ ] Создание Postman коллекции для тестирования
 - [ ] Использование Swagger UI
@@ -135,7 +135,6 @@ package.json
 - protected(accesstoken)   **GET    /surveys/:surveyId**             - Получение данных своей анкеты
 - protected(accesstoken)   **PATCH  /surveys/:surveyId**             - Обновление своей анкеты
 - protected(accesstoken)   **DELETE /surveys/:surveyId**             - Удаление своей анкеты
-- protected(accesstoken)   **GET    /surveys/:surveyId/responses**   - Получение ответов на свою анкету
 
 ### Модуль questions
 
@@ -147,3 +146,4 @@ package.json
 
 - protected(accesstoken) **GET   /surveys/:surveyId/form**          - Просмотр конкретной анкеты для заполнения
 - protected(accesstoken) **POST  /surveys/:surveyId/responses**     - Отправка заполненного ответа
+- protected(accesstoken) **GET   /surveys/:surveyId/responses**     - Получение ответов на свою анкету

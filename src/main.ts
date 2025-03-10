@@ -33,11 +33,11 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/v1/docs', app, document);
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(port, host).then(() => {
-    Logger.log(`http://${host}:${port} - server start`);
-    Logger.log(`http://${host}:${port}/v1/docs - swagger start`);
+    Logger.log(`http://${host}:${port}/api - server start`);
+    Logger.log(`http://${host}:${port}/api/docs - swagger start`);
   });
 }
 bootstrap();

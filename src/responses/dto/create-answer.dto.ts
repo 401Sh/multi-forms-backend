@@ -1,5 +1,4 @@
 import { IsArray, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
-import { CreateAnswerOptionDto } from './create-answer-option.dto';
 
 export class CreateAnswerDto {
   @IsUUID()
@@ -12,5 +11,5 @@ export class CreateAnswerDto {
 
   @IsArray()
   @IsOptional()
-  answerOptions: CreateAnswerOptionDto[]
+  answerOptions: string[]
 }
