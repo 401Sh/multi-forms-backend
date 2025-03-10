@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AnswerEntity } from './entities/answer.entity';
 import { ResponseEntity } from './entities/response.entity';
 import { AnswerOptionEntity } from './entities/answer-option.entity';
+import { SurveysModule } from 'src/surveys/surveys.module';
 
 @ApiTags('responses')
 @Module({
@@ -13,9 +14,10 @@ import { AnswerOptionEntity } from './entities/answer-option.entity';
     ResponseEntity,
     AnswerEntity,
     AnswerOptionEntity
-  ])],
+    ]),
+    SurveysModule
+  ],
   controllers: [ResponsesController],
-  providers: [ResponsesService],
-  exports: [ResponsesService]
+  providers: [ResponsesService]
 })
 export class ResponsesModule {}

@@ -44,15 +44,6 @@ export class SurveysController {
 
 
   @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
-  @Get(':surveyId/responses')
-  async findMySurveyResponses(
-    @Param('surveyId', ParseUUIDPipe) surveyId: string
-  ) {
-    return await this.surveysService.findSurveyResponses(surveyId);
-  };
-
-
-  @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
   @Get(':surveyId')
   async findMySurveyById(
     @Param('surveyId', ParseUUIDPipe) surveyId: string

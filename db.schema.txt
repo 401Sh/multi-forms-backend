@@ -48,7 +48,7 @@ Table Response {
 Table Answer {
   id int [primary key]
   // userId int [unique, not null]
-  respondentId int [not null]
+  responseId int [not null]
   questionId int [not null]
   answerText varchar
 }
@@ -89,7 +89,7 @@ Ref: Question.id < QuestionOption.questionId
 
 // Ref: User.id < Answer.userId
 Ref: Survey.id < Response.surveyId
-Ref: Response.id < Answer.respondentId
+Ref: Response.id < Answer.responseId
 Ref: Question.id < Answer.questionId
 Ref: AnswerOption.answerId > Answer.id
 Ref: AnswerOption.optionId > QuestionOption.id

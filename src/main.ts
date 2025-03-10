@@ -15,6 +15,7 @@ const logLevels = process.env.LOG_LEVEL?.split(',') as LogLevel[] || ['log', 'er
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.setGlobalPrefix('api');
   app.useLogger(logLevels);
   app.use(cookieParser());
 

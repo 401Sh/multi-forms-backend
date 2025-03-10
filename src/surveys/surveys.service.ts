@@ -23,7 +23,6 @@ export class SurveysService {
     private surveyRepository: Repository<SurveyEntity>,
 
     private usersService: UsersService,
-    private responsesService: ResponsesService
   ) {}
 
 
@@ -145,13 +144,6 @@ export class SurveysService {
   };
 
 
-  async findSurveyResponses(surveyId: string) {
-    const responses = await this.responsesService.findResponses(surveyId);
-
-    return responses
-  };
-
-
   async update(id: string, UpdateSurveyDto: UpdateSurveyDto) {
     SurveysService.logger.log(`Updating survey with id: ${id}`);
     await this.surveyRepository.update({ id: id }, UpdateSurveyDto);
@@ -171,5 +163,44 @@ export class SurveysService {
     };
 
     return deleteResult;
+  };
+
+
+  async findForm(id: string) {
+    const survey = await this.surveyRepository
+      .createQueryBuilder("survey")
+      .leftJoin("survey.questions", "question")
+      .leftJoin("question.questionOptions", "option")
+      .select([
+        "survey.id",
+        "survey.userId",
+        "survey.name",
+        "survey.description",
+        "survey.isPublished",
+        "survey.totalPoints",
+        "question.id",
+        "question.surveyId",
+        "question.name",
+        "question.page",
+        "question.position",
+        "question.questionText",
+        "question.isMandatory",
+        "question.points",
+        "question.type",
+        "option.id",
+        "option.questionId",
+        "option.position",
+        "option.points",
+        "option.text"
+      ])
+      .where("survey.id = :id", { id })
+      .getOne();
+
+    if (!survey) {
+      SurveysService.logger.log(`Cannot find survey form ${id}. No such survey`);
+      throw new NotFoundException(`Survey with id ${id} not found`);
+    };
+
+    return survey;
   };
 };
