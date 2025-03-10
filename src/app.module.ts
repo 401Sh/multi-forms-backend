@@ -6,8 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from 'database/db-source';
 import { ConfigModule } from '@nestjs/config';
 import { SurveysModule } from './surveys/surveys.module';
-import { RespondentsModule } from './respondents/respondents.module';
+import { ResponsesModule } from './responses/response.module';
 import { AuthModule } from './auth/auth.module';
+import { QuestionsModule } from './questions/questions.module';
 
 @Module({
   imports: [
@@ -19,8 +20,10 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     SurveysModule,
-    RespondentsModule,
-    AuthModule],
+    ResponsesModule,
+    AuthModule,
+    QuestionsModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -4,11 +4,10 @@ import {
   Column, 
   ManyToOne, 
   BaseEntity,
-  JoinTable,
   OneToMany
 } from 'typeorm';
-import { RespondentEntity } from './respondent.entity';
-import { QuestionEntity } from 'src/surveys/entities/question.entity';
+import { ResponseEntity } from './response.entity';
+import { QuestionEntity } from 'src/questions/entities/question.entity';
 import { AnswerOptionEntity } from './answer-option.entity';
 
 @Entity('answers')
@@ -20,11 +19,11 @@ export class AnswerEntity extends BaseEntity {
   answerText?: string;
 
   @ManyToOne(
-    () => RespondentEntity,
-    (respondent) => respondent.answers,
+    () => ResponseEntity,
+    (response) => response.answers,
     { onDelete: 'CASCADE', nullable: false }
   )
-  respondent: RespondentEntity;
+  response: ResponseEntity;
   
   @ManyToOne(
     () => QuestionEntity,
@@ -33,6 +32,6 @@ export class AnswerEntity extends BaseEntity {
   )
   question: QuestionEntity;
 
-  @OneToMany(() => AnswerOptionEntity, (answerOptions) => answerOptions.answer)
+  @OneToMany(() => AnswerOptionEntity, (answerOption) => answerOption.answer)
   answerOptions: AnswerOptionEntity[];
 };

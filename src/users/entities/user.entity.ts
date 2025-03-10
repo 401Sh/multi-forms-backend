@@ -1,6 +1,3 @@
-import { RefreshSessionEntity } from 'src/auth/entities/refresh-session.entity';
-import { RespondentEntity } from 'src/respondents/entities/respondent.entity';
-import { SurveyEntity } from 'src/surveys/entities/survey.entity';
 import { 
   Entity, 
   PrimaryGeneratedColumn, 
@@ -10,6 +7,9 @@ import {
   BaseEntity,
   OneToMany
 } from 'typeorm';
+import { RefreshSessionEntity } from 'src/auth/entities/refresh-session.entity';
+import { SurveyEntity } from 'src/surveys/entities/survey.entity';
+import { ResponseEntity } from 'src/responses/entities/response.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
@@ -31,12 +31,12 @@ export class UserEntity extends BaseEntity {
   @OneToMany(() => SurveyEntity, (survey) => survey.user)
   surveys: SurveyEntity[];
 
-  @OneToMany(() => RespondentEntity, (respondent) => respondent.user)
-  respondents: RespondentEntity[];
+  @OneToMany(() => ResponseEntity, (response) => response.user)
+  responses: ResponseEntity[];
 
   @OneToMany(
     () => RefreshSessionEntity,
-    (refreshSessions) => refreshSessions.user,
+    (refreshSession) => refreshSession.user,
     { cascade: true, onDelete: 'CASCADE' }
   )
   refreshSessions: RefreshSessionEntity[];

@@ -6,9 +6,9 @@ import {
   BaseEntity,
   OneToMany
 } from 'typeorm';
-import { QuestionType } from './survey.enum';
-import { SurveyEntity } from './survey.entity';
-import { AnswerEntity } from 'src/respondents/entities/answer.entity';
+import { QuestionType } from '../enums/question.enum';
+import { SurveyEntity } from 'src/surveys/entities/survey.entity';
+import { AnswerEntity } from 'src/responses/entities/answer.entity';
 import { QuestionOptionEntity } from './question-option.entity';
 
 @Entity('questions')

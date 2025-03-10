@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { SurveysService } from './surveys.service';
 import { GetSurveysQueryDto } from './dto/get-surveys-query.dto';
-import { SurveyAccess } from './entities/survey.enum';
+import { SurveyAccess } from './enums/survey.enum';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { Response } from 'express';
 import { SurveyOwnerGuard } from 'src/guards/survey-owner.guards';

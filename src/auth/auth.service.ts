@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
@@ -59,7 +59,7 @@ export class AuthService {
     const existiingSession = await this.findRefreshSession(user, fp);
 
     if (existiingSession){
-      this.deleteRefreshSession(user, fp);
+      await this.deleteRefreshSession(user.id, fp);
     };
     
     // Create tokens
@@ -72,18 +72,6 @@ export class AuthService {
       fp
     );
     return tokens;
-  };
-
-
-  async logout(userId: string, fp: string) {
-    const user = await this.usersService.findById(userId);
-    if (!user) {
-      AuthService.logger.error(`User with id: ${userId} - not found`);
-      throw new Error('User not found');
-    };
-
-    AuthService.logger.log(`Deleting user ${userId} session`);
-    return this.refreshSessionRepository.delete({ user: { id: user.id }, fingerprint: fp });
   };
 
 
@@ -111,7 +99,7 @@ export class AuthService {
     const refreshTokenTTL = this.configService.get<string>('REFRESH_TOKEN_TTL') || '3d'
     const ttl = AuthService.parseTTL(refreshTokenTTL);
 
-    this.refreshSessionRepository.save({
+    await this.refreshSessionRepository.save({
       user,
       refreshToken: hashedRefreshToken,
       userAgent,
@@ -173,7 +161,7 @@ export class AuthService {
       fingerprint,
     );
 
-    this.deleteRefreshSession(user, fingerprint);
+    await this.deleteRefreshSession(user.id, fingerprint);
 
     AuthService.logger.debug(`Created new jwt tokens for user ${user.id}`);
     return tokens;
@@ -236,9 +224,21 @@ export class AuthService {
   };
 
 
-  async deleteRefreshSession(user: UserEntity, fp: string){
-    AuthService.logger.debug(`Deleting session of user id: ${user.id}`);
-    return this.refreshSessionRepository.delete({ user: { id: user.id }, fingerprint: fp });
+  async deleteRefreshSession(userId: string, fp: string){
+    AuthService.logger.log(`Deleting user ${userId} session`);
+    const deleteResult = await this.refreshSessionRepository.delete(
+      { user: { id: userId },
+      fingerprint: fp }
+    );
+
+    if (deleteResult.affected === 0) {
+      AuthService.logger.debug(
+        `Cannot delete session.
+         No session with user id: ${userId} and fingerprint ${fp}`);
+      throw new NotFoundException('Session not found');
+    };
+
+    return deleteResult;
   }
 
 

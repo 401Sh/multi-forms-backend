@@ -1,5 +1,5 @@
 import { IsOptional, IsString, IsBoolean, IsInt, IsEnum, IsNotEmpty, Min } from 'class-validator';
-import { QuestionType } from '../entities/survey.enum';
+import { QuestionType } from '../enums/question.enum';
 
 export class CreateQuestionDto {
   @IsString()

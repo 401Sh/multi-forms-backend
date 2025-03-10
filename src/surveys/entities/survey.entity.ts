@@ -8,10 +8,10 @@ import {
   BaseEntity,
   OneToMany
 } from 'typeorm';
-import { SurveyAccess } from './survey.enum';
+import { SurveyAccess } from '../enums/survey.enum';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { QuestionEntity } from './question.entity';
-import { RespondentEntity } from 'src/respondents/entities/respondent.entity';
+import { QuestionEntity } from 'src/questions/entities/question.entity';
+import { ResponseEntity } from 'src/responses/entities/response.entity';
 
 @Entity('surveys')
 export class SurveyEntity extends BaseEntity {
@@ -47,11 +47,11 @@ export class SurveyEntity extends BaseEntity {
   questions: QuestionEntity[];
 
   @OneToMany(
-    () => RespondentEntity,
-    (respondent) => respondent.survey,
+    () => ResponseEntity,
+    (response) => response.survey,
     { cascade: true, onDelete: 'CASCADE' }
   )
-  respondents: RespondentEntity[];
+  responses: ResponseEntity[];
 
   @ManyToOne(
     () => UserEntity,

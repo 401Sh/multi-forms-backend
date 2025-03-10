@@ -12,7 +12,7 @@ export class UsersController {
 
 
   @UseGuards(AccessTokenGuard)
-  @Get('')
+  @Get()
   async findAll() {
     return await this.usersService.findAll();
   };

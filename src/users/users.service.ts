@@ -52,7 +52,7 @@ export class UsersService {
     const user = await this.userRepository
       .createQueryBuilder('users')
       .where('users.id = :id', { id })
-      .select(['users.login'])
+      .select(['users.login', 'users.id'])
       .getOne();
 
     if (!user) {
@@ -90,7 +90,7 @@ export class UsersService {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       UsersService.logger.log(`Cannot update user. No user with id: ${id}`);
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundException('User not found');
     };
 
     // Check login
@@ -119,7 +119,7 @@ export class UsersService {
 
     if (deleteResult.affected === 0) {
       UsersService.logger.log(`Cannot delete user. No user with id: ${id}`);
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundException('User not found');
     };
 
     return deleteResult;

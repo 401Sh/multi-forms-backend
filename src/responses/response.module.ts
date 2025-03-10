@@ -1,20 +1,20 @@
 import { Module } from '@nestjs/common';
-import { RespondentsController } from './respondents.controller';
-import { RespondentsService } from './respondents.service';
+import { ResponsesController } from './response.controller';
+import { ResponsesService } from './response.service';
 import { ApiTags } from '@nestjs/swagger';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AnswerEntity } from './entities/answer.entity';
-import { RespondentEntity } from './entities/respondent.entity';
+import { ResponseEntity } from './entities/response.entity';
 import { AnswerOptionEntity } from './entities/answer-option.entity';
 
-@ApiTags('users')
+@ApiTags('responses')
 @Module({
   imports: [TypeOrmModule.forFeature([
+    ResponseEntity,
     AnswerEntity,
-    RespondentEntity,
     AnswerOptionEntity
   ])],
-  controllers: [RespondentsController],
-  providers: [RespondentsService]
+  controllers: [ResponsesController],
+  providers: [ResponsesService]
 })
-export class RespondentsModule {}
+export class ResponsesModule {}

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SurveyEntity } from './entities/survey.entity';
 import { DeleteResult, Repository } from 'typeorm';
 import { GetSurveysQueryDto } from './dto/get-surveys-query.dto';
-import { SurveyAccess } from './entities/survey.enum';
+import { SurveyAccess } from './enums/survey.enum';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { UsersService } from 'src/users/users.service';
 
@@ -109,10 +109,10 @@ export class SurveysService {
     // Count responses
     queryBuilder.addSelect(subQuery =>
       subQuery
-        .select('COUNT(respondents.id)', 'respondentsCount')
-        .from('respondents', 'respondents')
-        .where('respondents.surveyId = surveys.id'),
-      'respondentsCount',
+        .select('COUNT(responses.id)', 'responsesCount')
+        .from('responses', 'responses')
+        .where('responses.surveyId = surveys.id'),
+      'responsesCount',
     );
 
     // Pagination

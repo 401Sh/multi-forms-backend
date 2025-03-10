@@ -11,8 +11,8 @@ import { AnswerEntity } from './answer.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { SurveyEntity } from 'src/surveys/entities/survey.entity';
 
-@Entity('respondents')
-export class RespondentEntity extends BaseEntity {
+@Entity('responses')
+export class ResponseEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -27,21 +27,21 @@ export class RespondentEntity extends BaseEntity {
 
   @OneToMany(
     () => AnswerEntity,
-    (answer) => answer.respondent,
+    (answer) => answer.response,
     { cascade: true, onDelete: 'CASCADE' }
   )
   answers: AnswerEntity[];
 
   @ManyToOne(
     () => SurveyEntity,
-    (survey) => survey.respondents,
+    (survey) => survey.responses,
     { onDelete: 'CASCADE', nullable: false }
   )
   survey: SurveyEntity;
 
   @ManyToOne(
     () => UserEntity,
-    (user) => user.respondents,
+    (user) => user.responses,
     { onDelete: 'SET NULL', nullable: true }
   )
   user: UserEntity;

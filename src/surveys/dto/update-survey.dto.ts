@@ -1,5 +1,5 @@
 import { IsOptional, IsString, IsEnum, IsNumber, IsBoolean } from 'class-validator';
-import { SurveyAccess } from '../entities/survey.enum';
+import { SurveyAccess } from '../enums/survey.enum';
 
 export class UpdateSurveyDto {
   @IsString()

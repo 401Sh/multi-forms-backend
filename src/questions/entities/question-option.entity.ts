@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { QuestionEntity } from './question.entity';
-import { AnswerOptionEntity } from 'src/respondents/entities/answer-option.entity';
+import { AnswerOptionEntity } from 'src/responses/entities/answer-option.entity';
 
 @Entity('questionOptions')
 export class QuestionOptionEntity extends BaseEntity {
@@ -28,7 +28,7 @@ export class QuestionOptionEntity extends BaseEntity {
   
   @OneToMany(
     () => AnswerOptionEntity,
-    (answerOptions) => answerOptions.questionOption,
+    (answerOption) => answerOption.questionOption,
     { cascade: true }
   )
   answerOptions: AnswerOptionEntity[];

@@ -1,4 +1,4 @@
-import { Body, Controller, Ip, Post, Headers, Request, UseGuards, Res } from '@nestjs/common';
+import { Body, Controller, Ip, Post, Headers, Request, UseGuards, Res, Delete } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -50,13 +50,15 @@ export class AuthController {
 
   
   @UseGuards(AccessTokenGuard)
-  @Post('logout')
+  @Delete('logout')
   async logout(
     @Headers('x-fingerprint') fingerprint: string,
     @Request() req,
     @Res() res: Response
   ) {
-    await this.authService.logout(req.user['sub'], fingerprint);
+    const userId = req.user['sub'];
+
+    await this.authService.deleteRefreshSession(userId, fingerprint);
     res.clearCookie('refreshToken', { path: '/' });
 
     return res.status(200).send({ message: 'Succesfully logout' });

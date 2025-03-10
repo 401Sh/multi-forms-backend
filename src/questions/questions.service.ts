@@ -3,10 +3,10 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { QuestionEntity } from './entities/question.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateQuestionDto } from './dto/create-question.dto';
-import { SurveyEntity } from './entities/survey.entity';
+import { SurveyEntity } from '../surveys/entities/survey.entity';
 import { QuestionOptionEntity } from './entities/question-option.entity';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { QuestionType } from './entities/survey.enum';
+import { QuestionType } from './enums/question.enum';
 import { UpdateQuestionOptionDto } from './dto/update-question-option.dto';
 
 @Injectable()
