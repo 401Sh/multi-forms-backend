@@ -15,6 +15,7 @@ import { AnswerOptionEntity } from './entities/answer-option.entity';
     AnswerOptionEntity
   ])],
   controllers: [ResponsesController],
-  providers: [ResponsesService]
+  providers: [ResponsesService],
+  exports: [ResponsesService]
 })
 export class ResponsesModule {}

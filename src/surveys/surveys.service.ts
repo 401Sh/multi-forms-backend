@@ -6,6 +6,7 @@ import { GetSurveysQueryDto } from './dto/get-surveys-query.dto';
 import { SurveyAccess } from './enums/survey.enum';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { UsersService } from 'src/users/users.service';
+import { ResponsesService } from 'src/responses/response.service';
 
 type SurveyOptions = {
   userId?: string,
@@ -21,7 +22,8 @@ export class SurveysService {
     @InjectRepository(SurveyEntity)
     private surveyRepository: Repository<SurveyEntity>,
 
-    private usersService: UsersService
+    private usersService: UsersService,
+    private responsesService: ResponsesService
   ) {}
 
 
@@ -140,6 +142,13 @@ export class SurveysService {
       currentPage: page,
       totalPages: Math.ceil(totalSurveys / pageSize),
     };
+  };
+
+
+  async findSurveyResponses(surveyId: string) {
+    const responses = await this.responsesService.findResponses(surveyId);
+
+    return responses
   };
 
 
