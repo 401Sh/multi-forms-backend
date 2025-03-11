@@ -189,17 +189,6 @@ export class QuestionsService {
     };
     
     await queryRunner.manager.update(QuestionEntity, question.id, updateData);
-
-    // const updatedQuestion = await queryRunner.manager.findOne(
-    //   QuestionEntity, { where: { id: question.id } }
-    // );
-
-    // if (!updatedQuestion) {
-    //   QuestionsService.logger.debug(`Cannot update fields in question ${question.id}. No such question`);
-    //   throw new NotFoundException(`Question with ID ${question.id} not found`);
-    // };
-
-    // return updatedQuestion;
   };
 
 

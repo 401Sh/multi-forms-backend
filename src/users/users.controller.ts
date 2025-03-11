@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response } from 'express';
+import { pick } from 'lodash';
 
 @ApiTags('users')
 @Controller('users')
@@ -22,14 +23,16 @@ export class UsersController {
   @Get('self')
   async findMe(@Request() req) {
     const userId = req.user['sub'];
-    return await this.usersService.findById(userId);
+    const findedUser = await this.usersService.findById(userId);
+    return pick(findedUser, 'login');
   };
 
 
   @UseGuards(AccessTokenGuard)
   @Get(':userId')
   async findById(@Param('userId', ParseUUIDPipe) userId: string) {
-    return await this.usersService.findById(userId);
+    const findedUser = await this.usersService.findById(userId);
+    return pick(findedUser, 'login');
   };
 
 
@@ -40,12 +43,12 @@ export class UsersController {
     @Request() req
   ) {
     const userId = req.user['sub'];
-    const login = await this.usersService.update(userId, updateUserDto);
+    const updatedUser = await this.usersService.update(userId, updateUserDto);
 
     return {
       statusCode: HttpStatus.OK,
       message: 'User updated successfully',
-      user: login,
+      user: pick(updatedUser, 'login'),
     };
   };
 

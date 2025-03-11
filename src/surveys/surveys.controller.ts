@@ -7,6 +7,7 @@ import { SurveyAccess } from './enums/survey.enum';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { Response } from 'express';
 import { SurveyOwnerGuard } from 'src/guards/survey-owner.guards';
+import { omit } from 'lodash';
 
 @ApiTags('surveys')
 @Controller('surveys')
@@ -18,7 +19,8 @@ export class SurveysController {
   @Post()
   async create(@Request() req) {
     const userId = req.user['sub'];
-    return await this.surveysService.createSurvey(userId);
+    const createdSurvey = await this.surveysService.createSurvey(userId);
+    return omit(createdSurvey, 'user');
   };
 
 
@@ -48,7 +50,9 @@ export class SurveysController {
   async findMySurveyById(
     @Param('surveyId', ParseUUIDPipe) surveyId: string
   ) {
-    return await this.surveysService.findById(surveyId);
+    const survey = await this.surveysService.findById(surveyId);
+
+    return omit(survey, 'user');
   };
 
 

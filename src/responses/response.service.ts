@@ -38,9 +38,7 @@ export class ResponsesService {
       throw new ForbiddenException('Survey does not available');
     };
 
-    // return form;
-    // temporary solution - typeorm for some reasons ignores select option in query builder
-    return omit(form, ['access', 'questions.answer', 'questions.questionOptions.isCorrect']);
+    return form;
   };
 
 
@@ -137,13 +135,6 @@ export class ResponsesService {
       .leftJoinAndSelect('answers.answerOptions', 'answerOptions')
       .where('responses.surveyId = :surveyId', { surveyId })
       .getMany();
-
-    // const responses = await this.responseRepository
-    // .createQueryBuilder('response')
-    // .leftJoinAndSelect('response.answers', 'answer')
-    // .leftJoinAndSelect('answer.answerOptions', 'answerOption')
-    // .where('response.surveyId = :surveyId', { surveyId })
-    // .getMany();
 
     return responses;
   };

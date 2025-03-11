@@ -17,14 +17,14 @@ export class SurveyOwnerGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     const surveyId = request.params.surveyId;
-
+    
     // Skip check for no surveyId routes
     if (!surveyId) {
       return true;
     }
 
     const survey = await this.surveysService.findById(surveyId);
-
+    console.dir(survey, {depth:5})
     if (survey.user.id !== user.sub) {
       const logger = new Logger(SurveyOwnerGuard.name);
       logger.log('Attempt to access resource, which does not belong to the user')

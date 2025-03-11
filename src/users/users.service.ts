@@ -47,7 +47,6 @@ export class UsersService {
   };
 
 
-
   async findById(id: string): Promise<UserEntity> {
     const user = await this.userRepository
       .createQueryBuilder('users')
@@ -65,9 +64,6 @@ export class UsersService {
   };
 
 
-  /**
-   * Only for **internal** use
-  */
   async findByLogin(login: string): Promise<UserEntity> {
     const user = await this.userRepository
       .createQueryBuilder('users')
@@ -109,7 +105,7 @@ export class UsersService {
     await this.userRepository.update({ id: id }, updateUserDto);
 
     const updatedUser = await this.userRepository.findOne({ where: { id } });
-    return { login: updatedUser?.login };
+    return updatedUser;
   };
 
 

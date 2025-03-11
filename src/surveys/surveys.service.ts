@@ -104,8 +104,14 @@ export class SurveysService {
     // Order param
     if (ordering) {
       const [orderBy, orderDirection] = ordering.split(':');
-      queryBuilder.orderBy(orderBy, orderDirection.toUpperCase() as 'ASC' | 'DESC');
-    };
+      const validDirections = ['ASC', 'DESC'];
+    
+      if (orderBy && validDirections.includes(orderDirection.toUpperCase())) {
+        queryBuilder.orderBy(orderBy, orderDirection.toUpperCase() as 'ASC' | 'DESC');
+      } else {
+        throw new Error('Invalid ordering format. Expected "field:asc" or "field:desc".');
+      }
+    }
 
     // Count responses
     queryBuilder.addSelect(subQuery =>
@@ -118,16 +124,6 @@ export class SurveysService {
 
     // Pagination
     queryBuilder.skip((page - 1) * pageSize).take(pageSize);
-
-    // Required fields
-    queryBuilder.addSelect([
-      'surveys.id',
-      'surveys.name',
-      'surveys.description',
-      'surveys.isPublished',
-      'surveys.access',
-      'surveys.updatedAt',
-    ]);
 
     // Execute the query and return the results
     const surveys = await queryBuilder.getMany();
@@ -171,28 +167,6 @@ export class SurveysService {
       .createQueryBuilder("survey")
       .leftJoin("survey.questions", "question")
       .leftJoin("question.questionOptions", "option")
-      .select([
-        "survey.id",
-        "survey.userId",
-        "survey.name",
-        "survey.description",
-        "survey.isPublished",
-        "survey.totalPoints",
-        "question.id",
-        "question.surveyId",
-        "question.name",
-        "question.page",
-        "question.position",
-        "question.questionText",
-        "question.isMandatory",
-        "question.points",
-        "question.type",
-        "option.id",
-        "option.questionId",
-        "option.position",
-        "option.points",
-        "option.text"
-      ])
       .where("survey.id = :id", { id })
       .getOne();
 

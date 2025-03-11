@@ -6,6 +6,7 @@ import { SurveyOwnerGuard } from 'src/guards/survey-owner.guards';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { Response } from 'express';
+import { omit } from 'lodash';
 
 @ApiTags('questions')
 @Controller('surveys/:surveyId/questions')
@@ -18,7 +19,9 @@ export class QuestionsController {
     @Param('surveyId', ParseUUIDPipe) surveyId: string,
     @Body() data: CreateQuestionDto
   ) {
-    return await this.questionsService.createQuestionTransaction(surveyId, data);
+    const question = await this.questionsService.createQuestionTransaction(surveyId, data);
+
+    return omit(question, 'survey');
   };
 
 
@@ -28,7 +31,7 @@ export class QuestionsController {
     @Param('questionId', ParseUUIDPipe) questionId: string,
     @Body() data: UpdateQuestionDto
   ) {
-    return await this.questionsService.updateQuestionTransaction(questionId, data)
+    return await this.questionsService.updateQuestionTransaction(questionId, data);
   };
 
 

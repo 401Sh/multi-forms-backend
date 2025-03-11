@@ -37,6 +37,11 @@ export class ResponsesController {
     @Body() data: CreateResponseDto
   ) {
     const userId = req.user['sub'];
-    return await this.responsesService.create(surveyId, userId, data);
+    await this.responsesService.create(surveyId, userId, data);
+
+    return {
+      message: 'Survey created successfully',
+      statusCode: 201
+    };
   };
 };
