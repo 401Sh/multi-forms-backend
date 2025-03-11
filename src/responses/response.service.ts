@@ -45,7 +45,9 @@ export class ResponsesService {
   // Abomination function - needs to rework
   async create(surveyId: string, userId: string, data: CreateResponseDto) {
     const questionIds = data.answers.map(d => d.questionId);
-    const questions = await this.questionsService.findQuestionsByIds(questionIds);
+    const questions = await this.questionsService.findSurveyQuestionsByIds(
+      surveyId, questionIds
+    );
     const survey = await this.surveysService.findById(surveyId);
     
     const response = this.responseRepository.create({
@@ -56,7 +58,9 @@ export class ResponsesService {
     });
     await this.responseRepository.save(response);
 
-    const { createdAnswers, score } = await this.createAnswersAndCalcScore(response, questions, data.answers);
+    const { createdAnswers, score } = await this.createAnswersAndCalcScore(
+      response, questions, data.answers
+    );
 
     response.answers = createdAnswers;
     response.score = score;
@@ -66,7 +70,11 @@ export class ResponsesService {
 
 
   // Abomination function - needs to rework
-  private async createAnswersAndCalcScore(response: ResponseEntity, questions: QuestionEntity[], data: CreateAnswerDto[]) {
+  private async createAnswersAndCalcScore(
+    response: ResponseEntity,
+    questions: QuestionEntity[],
+    data: CreateAnswerDto[]
+  ) {
     let score = 0;
     const answers: AnswerEntity[] = [];
 
@@ -87,7 +95,9 @@ export class ResponsesService {
       } else {
         await this.answerRepository.save(answer);
 
-        const { createdAnswerOptions, additionalScore } = await this.createOptionsAndCalcScore(answer, d.answerOptions, question.questionOptions);
+        const { createdAnswerOptions, additionalScore } = await this.createOptionsAndCalcScore(
+          answer, d.answerOptions, question.questionOptions
+        );
         answer.answerOptions = createdAnswerOptions;
         score += additionalScore;
       };
@@ -101,7 +111,11 @@ export class ResponsesService {
 
 
   // Abomination function - needs to rework
-  private async createOptionsAndCalcScore(answer: AnswerEntity, data: string[], options: QuestionOptionEntity[]) {
+  private async createOptionsAndCalcScore(
+    answer: AnswerEntity,
+    data: string[],
+    options: QuestionOptionEntity[]
+  ) {
     let score = 0;
     const answerOptions: AnswerOptionEntity[] = [];
 

@@ -243,19 +243,6 @@ export class QuestionsService {
     newPoints: number,
     oldPoints: number
   ) {
-    // const survey = await queryRunner.manager.findOne(
-    //   SurveyEntity, { where: { id: surveyId } }
-    // );
-
-    // if (!survey) {
-    //   QuestionsService.logger.debug(`Cannot update field totalPoints in survey ${surveyId}. No such survey`);
-    //   throw new NotFoundException(`Survey with ID ${surveyId} not found`);
-    // };
-
-    // const pointsDiff = newPoints - oldPoints;
-    // const totalPoints = (survey.totalPoints ?? 0) + pointsDiff;
-    // await queryRunner.manager.update(SurveyEntity, surveyId, { totalPoints });
-
     const pointsDiff = newPoints - oldPoints;
 
     const result = await queryRunner.manager.increment(
@@ -352,12 +339,16 @@ export class QuestionsService {
     return position
   };
 
-  async findQuestionsByIds(questionIds: string[]) {
+
+  async findSurveyQuestionsByIds(surveyId: string, questionIds: string[]) {
     const questions = await this.questionRepository.find({
-      where: { id: In(questionIds) },
+      where: {
+        id: In(questionIds),
+        survey: { id: surveyId }
+      },
       relations: ['questionOptions'] // Загружаем опции вопросов
     });
 
     return questions;
-  }
+  };
 };
