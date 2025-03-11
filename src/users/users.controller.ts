@@ -15,7 +15,10 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   @Get()
   @ApiOperation({ summary: 'Получить всех пользователей' })
-  @ApiResponse({ status: 200, description: 'Список пользователей успешно получен' })
+  @ApiResponse({
+    status: 200,
+    description: 'Список пользователей успешно получен'
+  })
   async findAll() {
     return await this.usersService.findAll();
   };
@@ -24,7 +27,10 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   @Get('self')
   @ApiOperation({ summary: 'Получить данные о себе' })
-  @ApiResponse({ status: 200, description: 'Информация о пользователе успешно получена' })
+  @ApiResponse({
+    status: 200,
+    description: 'Информация о пользователе успешно получена'
+  })
   async findMe(@Request() req) {
     const userId = req.user['sub'];
     return await this.usersService.findById(userId);
@@ -41,8 +47,14 @@ export class UsersController {
     required: true,
     description: 'UUID пользователя'
   })
-  @ApiResponse({ status: 200, description: 'Информация о пользователе успешно получена' })
-  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
+  @ApiResponse({
+    status: 200,
+    description: 'Информация о пользователе успешно получена'
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Пользователь не найден'
+  })
   async findById(@Param('userId', ParseUUIDPipe) userId: string) {
     return await this.usersService.findById(userId);
   };

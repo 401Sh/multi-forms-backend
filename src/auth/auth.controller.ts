@@ -19,10 +19,26 @@ export class AuthController {
     description: 'Данные для регистрации акаунта',
     type: CreateUserDto
   })
-  @ApiResponse({ status: 201, description: 'Пользователь успешно зарегистрирован' })
-  @ApiResponse({ status: 400, description: 'Ошибка валидации' })
-  @ApiHeader({ name: 'user-agent', description: 'User-Agent заголовок', required: true })
-  @ApiHeader({ name: 'x-fingerprint', description: 'Уникальный отпечаток устройства', required: true })
+  @ApiResponse({
+    status: 201,
+    description: 'Пользователь успешно зарегистрирован'
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Ошибка валидации'
+  })
+  @ApiHeader({
+    name: 'user-agent',
+    description: 'User-Agent заголовок',
+    required: true,
+    example: 'Mozilla/5.0'
+  })
+  @ApiHeader({
+    name: 'x-fingerprint',
+    description: 'Уникальный отпечаток устройства',
+    required: true,
+    example: '123456789abcdef',
+  })
   async signup(
     @Headers('user-agent') userAgent: string,
     @Headers('x-fingerprint') fingerprint: string,
@@ -48,8 +64,18 @@ export class AuthController {
   })
   @ApiResponse({ status: 200, description: 'Успешный вход' })
   @ApiResponse({ status: 401, description: 'Неверные учетные данные' })
-  @ApiHeader({ name: 'user-agent', description: 'User-Agent заголовок', required: true })
-  @ApiHeader({ name: 'x-fingerprint', description: 'Уникальный отпечаток устройства', required: true })
+  @ApiHeader({
+    name: 'user-agent',
+    description: 'User-Agent заголовок',
+    required: true,
+    example: 'Mozilla/5.0'
+  })
+  @ApiHeader({
+    name: 'x-fingerprint',
+    description: 'Уникальный отпечаток устройства',
+    required: true,
+    example: '123456789abcdef'
+  })
   async signin(
     @Headers('user-agent') userAgent: string,
     @Headers('x-fingerprint') fingerprint: string,
@@ -72,7 +98,12 @@ export class AuthController {
   @ApiOperation({ summary: 'Выход из системы' })
   @ApiResponse({ status: 200, description: 'Успешный выход' })
   @ApiResponse({ status: 401, description: 'Неавторизованный запрос' })
-  @ApiHeader({ name: 'x-fingerprint', description: 'Уникальный отпечаток устройства', required: true })
+  @ApiHeader({
+    name: 'x-fingerprint',
+    description: 'Уникальный отпечаток устройства',
+    required: true,
+    example: '123456789abcdef'
+  })
   async logout(
     @Headers('x-fingerprint') fingerprint: string,
     @Request() req,
@@ -92,8 +123,18 @@ export class AuthController {
   @ApiOperation({ summary: 'Обновление токенов' })
   @ApiResponse({ status: 200, description: 'Токены обновлены' })
   @ApiResponse({ status: 401, description: 'Недействительный refreshToken' })
-  @ApiHeader({ name: 'user-agent', description: 'User-Agent заголовок', required: true })
-  @ApiHeader({ name: 'x-fingerprint', description: 'Уникальный отпечаток устройства', required: true })
+  @ApiHeader({
+    name: 'user-agent',
+    description: 'User-Agent заголовок',
+    required: true,
+    example: 'Mozilla/5.0'
+  })
+  @ApiHeader({
+    name: 'x-fingerprint',
+    description: 'Уникальный отпечаток устройства',
+    required: true,
+    example: '123456789abcdef'
+  })
   async refreshTokens(
     @Request() req,
     @Headers('user-agent') userAgent: string,
