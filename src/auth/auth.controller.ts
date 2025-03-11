@@ -1,5 +1,5 @@
 import { Body, Controller, Ip, Post, Headers, Request, UseGuards, Res, Delete } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthDto } from './dto/auth.dto';
@@ -14,6 +14,31 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
+  @ApiOperation({ summary: 'Регистрация пользователя' })
+  @ApiBody({
+    description: 'Данные для регистрации акаунта',
+    type: CreateUserDto
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Пользователь успешно зарегистрирован'
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Ошибка валидации'
+  })
+  @ApiHeader({
+    name: 'user-agent',
+    description: 'User-Agent заголовок',
+    required: true,
+    example: 'Mozilla/5.0'
+  })
+  @ApiHeader({
+    name: 'x-fingerprint',
+    description: 'Уникальный отпечаток устройства',
+    required: true,
+    example: '123456789abcdef',
+  })
   async signup(
     @Headers('user-agent') userAgent: string,
     @Headers('x-fingerprint') fingerprint: string,
@@ -32,6 +57,25 @@ export class AuthController {
 
 
   @Post('signin')
+  @ApiOperation({ summary: 'Авторизация пользователя' })
+  @ApiBody({ 
+    description: 'Данные для входа в аккаунт',
+    type: AuthDto
+  })
+  @ApiResponse({ status: 200, description: 'Успешный вход' })
+  @ApiResponse({ status: 401, description: 'Неверные учетные данные' })
+  @ApiHeader({
+    name: 'user-agent',
+    description: 'User-Agent заголовок',
+    required: true,
+    example: 'Mozilla/5.0'
+  })
+  @ApiHeader({
+    name: 'x-fingerprint',
+    description: 'Уникальный отпечаток устройства',
+    required: true,
+    example: '123456789abcdef'
+  })
   async signin(
     @Headers('user-agent') userAgent: string,
     @Headers('x-fingerprint') fingerprint: string,
@@ -51,6 +95,15 @@ export class AuthController {
   
   @UseGuards(AccessTokenGuard)
   @Delete('logout')
+  @ApiOperation({ summary: 'Выход из системы' })
+  @ApiResponse({ status: 200, description: 'Успешный выход' })
+  @ApiResponse({ status: 401, description: 'Неавторизованный запрос' })
+  @ApiHeader({
+    name: 'x-fingerprint',
+    description: 'Уникальный отпечаток устройства',
+    required: true,
+    example: '123456789abcdef'
+  })
   async logout(
     @Headers('x-fingerprint') fingerprint: string,
     @Request() req,
@@ -67,6 +120,21 @@ export class AuthController {
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
+  @ApiOperation({ summary: 'Обновление токенов' })
+  @ApiResponse({ status: 200, description: 'Токены обновлены' })
+  @ApiResponse({ status: 401, description: 'Недействительный refreshToken' })
+  @ApiHeader({
+    name: 'user-agent',
+    description: 'User-Agent заголовок',
+    required: true,
+    example: 'Mozilla/5.0'
+  })
+  @ApiHeader({
+    name: 'x-fingerprint',
+    description: 'Уникальный отпечаток устройства',
+    required: true,
+    example: '123456789abcdef'
+  })
   async refreshTokens(
     @Request() req,
     @Headers('user-agent') userAgent: string,

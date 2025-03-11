@@ -26,7 +26,7 @@ export class RefreshSessionEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 45 })
   ip: string;
 
-  @Column({ type: 'varchar', length: 512 })
+  @Column({ type: 'varchar', length: 512, nullable: true })
   fingerprint: string;
 
   @Column({ type: 'timestamp'})
