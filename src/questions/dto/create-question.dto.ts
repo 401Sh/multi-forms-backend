@@ -36,4 +36,4 @@ export class CreateQuestionDto {
   @IsEnum(QuestionType)
   @IsNotEmpty()
   type: QuestionType
-}
+};

@@ -18,4 +18,4 @@ export class UpdateQuestionOptionDto {
   @IsString()
   @IsOptional()
   text: string
-}
+};

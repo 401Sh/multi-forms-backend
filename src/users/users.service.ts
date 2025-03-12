@@ -41,7 +41,7 @@ export class UsersService {
     UsersService.logger.log(`Finding all users`);
     const users = await this.userRepository
       .createQueryBuilder('users')
-      .select(['users.login'])
+      .select(['users.login', 'users.id'])
       .getMany();
     return users;
   };

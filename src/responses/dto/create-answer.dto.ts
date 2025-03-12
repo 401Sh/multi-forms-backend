@@ -12,4 +12,4 @@ export class CreateAnswerDto {
   @IsArray()
   @IsOptional()
   answerOptions: string[]
-}
+};

@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsOptional, IsString, IsInt, Min } from 'class-validator';
+import { IsOptional, IsString, IsInt, Min, Matches } from 'class-validator';
 
 export class GetSurveysQueryDto {
   @IsString()
@@ -20,5 +20,6 @@ export class GetSurveysQueryDto {
 
   @IsString()
   @IsOptional()
+  @Matches(/^\S+$/, { message: 'Ordering must be without spaces' })
   ordering: string;
-}
+};
