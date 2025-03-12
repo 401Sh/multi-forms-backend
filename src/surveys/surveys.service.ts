@@ -6,7 +6,6 @@ import { GetSurveysQueryDto } from './dto/get-surveys-query.dto';
 import { SurveyAccess } from './enums/survey.enum';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { UsersService } from 'src/users/users.service';
-import { ResponsesService } from 'src/responses/response.service';
 
 type SurveyOptions = {
   userId?: string,
