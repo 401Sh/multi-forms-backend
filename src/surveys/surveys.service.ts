@@ -104,7 +104,10 @@ export class SurveysService {
     // Order param
     if (ordering) {
       const [orderBy, orderDirection] = ordering.split(':');
-      queryBuilder.orderBy(orderBy, orderDirection.toUpperCase() as 'ASC' | 'DESC');
+
+      if (orderBy && ['asc', 'desc'].includes(orderDirection?.toLowerCase())) {
+        queryBuilder.orderBy(orderBy, orderDirection.toUpperCase() as 'ASC' | 'DESC');
+      };
     };
 
     // Count responses
