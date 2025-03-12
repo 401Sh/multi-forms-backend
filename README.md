@@ -11,11 +11,11 @@
 - [X] Получение, изменение и удаление формы по id
 - [X] Отправка ответа на форму по id              <--- ***плохая реализация, необходимо переписать по возможности***
 - [X] Получение всех своих созданных форм
-- [ ] Создание Postman коллекции для тестирования
-- [ ] Использование Swagger UI
+- [X] Создание Postman коллекции для тестирования
+- [X] Использование Swagger UI
 - [ ] 
 Добавить docker-compose.yaml и Dockerfile файлы для развертывания базы данных и самого приложения в Docker контейнере.
-- [ ] Реализовать опциональную фильтрацию и сортировку
+- [X] Реализовать опциональную фильтрацию и сортировку    <--- реализовано для **/surveys/public** и **/surveys/self**
 
 ## Технологии
 
@@ -122,16 +122,16 @@ package.json
 
 ### Модуль auth
 
-- POST                     **/auth/signup**          - Регистрация
-- POST                     **/auth/signin**          - Авторизация
-- protected(accesstoken)   **DELETE  /auth/logout**  - Удаление сессии
-- protected(refreshtoken)  **POST  /auth/refresh**   - Обновление токенов
+- not protected            **POST    /auth/signup**    - Регистрация
+- not protected            **POST    /auth/signin**    - Авторизация
+- protected(accesstoken)   **DELETE  /auth/logout**    - Удаление сессии
+- protected(refreshtoken)  **POST    /auth/refresh**   - Обновление токенов
 
 ### Модуль surveys
 
 - protected(accesstoken)   **POST   /surveys/**                      - Создание новой анкеты
 - protected(accesstoken)   **GET    /surveys/self**                  - Получение своих анкет
-- GET                      **/surveys/public**                       - Просмотр публичных анкет
+- not protected            **GET    /surveys/public**                - Просмотр публичных анкет
 - protected(accesstoken)   **GET    /surveys/:surveyId**             - Получение данных своей анкеты
 - protected(accesstoken)   **PATCH  /surveys/:surveyId**             - Обновление своей анкеты
 - protected(accesstoken)   **DELETE /surveys/:surveyId**             - Удаление своей анкеты
