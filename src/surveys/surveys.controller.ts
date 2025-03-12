@@ -47,7 +47,7 @@ export class SurveysController {
   @ApiQuery({ name: 'ordering',
     required: false,
     description: 'Сортировка опросов',
-    example: 'ASC:name'
+    example: 'name:ASC'
   })
   @ApiResponse({ status: 200, description: 'Список моих опросов' })
   @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
@@ -82,7 +82,7 @@ export class SurveysController {
   @ApiQuery({ name: 'ordering',
     required: false,
     description: 'Сортировка опросов',
-    example: 'ASC:name'
+    example: 'name:ASC'
   })
   @ApiResponse({ status: 200, description: 'Список публичных опросов' })
   @Get('public')
@@ -96,7 +96,11 @@ export class SurveysController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Получить собственный опрос по ID' })
-  @ApiParam({ name: 'surveyId', description: 'UUID опроса' })
+  @ApiParam({
+    name: 'surveyId',
+    description: 'UUID опроса',
+    required: true
+  })
   @ApiResponse({ status: 200, description: 'Опрос найден' })
   @ApiResponse({ status: 403, description: 'Доступ запрещен' })
   @ApiResponse({ status: 404, description: 'Опрос не найден' })
@@ -111,7 +115,11 @@ export class SurveysController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Обновить мой опрос' })
-  @ApiParam({ name: 'surveyId', description: 'UUID опроса' })
+  @ApiParam({
+    name: 'surveyId',
+    description: 'UUID опроса',
+    required: true
+  })
   @ApiBody({
     description: 'Данные для обновления опроса',
     type: UpdateSurveyDto,
@@ -131,7 +139,11 @@ export class SurveysController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Удалить мой опрос' })
-  @ApiParam({ name: 'surveyId', description: 'UUID опроса' })
+  @ApiParam({
+    name: 'surveyId',
+    description: 'UUID опроса',
+    required: true
+  })
   @ApiResponse({ status: 204, description: 'Опрос удален' })
   @ApiResponse({ status: 403, description: 'Доступ запрещен' })
   @ApiResponse({ status: 404, description: 'Опрос не найден' })

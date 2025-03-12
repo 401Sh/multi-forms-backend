@@ -12,38 +12,34 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
 
-  @UseGuards(AccessTokenGuard)
-  @Get()
   @ApiOperation({ summary: 'Получить всех пользователей' })
   @ApiResponse({
     status: 200,
     description: 'Список пользователей успешно получен'
   })
+  @UseGuards(AccessTokenGuard)
+  @Get()
   async findAll() {
     return await this.usersService.findAll();
   };
   
 
-  @UseGuards(AccessTokenGuard)
-  @Get('self')
   @ApiOperation({ summary: 'Получить данные о себе' })
   @ApiResponse({
     status: 200,
     description: 'Информация о пользователе успешно получена'
   })
+  @UseGuards(AccessTokenGuard)
+  @Get('self')
   async findMe(@Request() req) {
     const userId = req.user['sub'];
     return await this.usersService.findById(userId);
   };
 
 
-  @UseGuards(AccessTokenGuard)
-  @Get(':userId')
   @ApiOperation({ summary: 'Найти пользователя по ID' })
   @ApiParam({
     name: 'userId',
-    type: 'string',
-    format: 'uuid',
     required: true,
     description: 'UUID пользователя'
   })
@@ -55,19 +51,21 @@ export class UsersController {
     status: 404,
     description: 'Пользователь не найден'
   })
+  @UseGuards(AccessTokenGuard)
+  @Get(':userId')
   async findById(@Param('userId', ParseUUIDPipe) userId: string) {
     return await this.usersService.findById(userId);
   };
 
 
-  @UseGuards(AccessTokenGuard)
-  @Patch('self')
   @ApiOperation({ summary: 'Обновить данные о себе' })
   @ApiBody({
     description: 'Данные для обновления пользователя',
     type: UpdateUserDto,
   })
   @ApiResponse({ status: 200, description: 'Пользователь успешно обновлен' })
+  @UseGuards(AccessTokenGuard)
+  @Patch('self')
   async updateMe(
     @Body() updateUserDto: UpdateUserDto,
     @Request() req
@@ -83,10 +81,10 @@ export class UsersController {
   };
 
 
-  @UseGuards(AccessTokenGuard)
-  @Delete('self')
   @ApiOperation({ summary: 'Удалить свой аккаунт' })
   @ApiResponse({ status: 204, description: 'Пользователь успешно удален' })
+  @UseGuards(AccessTokenGuard)
+  @Delete('self')
   async deleteMe(
     @Request() req,
     @Res() res: Response

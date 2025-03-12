@@ -13,7 +13,11 @@ export class ResponsesController {
 
 
   @ApiOperation({ summary: 'Получить ответы на опрос' })
-  @ApiParam({ name: 'surveyId', description: 'UUID опроса' })
+  @ApiParam({
+    name: 'surveyId',
+    description: 'UUID опроса',
+    required: true
+  })
   @ApiResponse({ status: 200, description: 'Ответы получены успешно' })
   @ApiResponse({ status: 403, description: 'Нет доступа' })
   @UseGuards(AccessTokenGuard, SurveyOwnerGuard)
@@ -26,7 +30,11 @@ export class ResponsesController {
 
 
   @ApiOperation({ summary: 'Получить форму опроса' })
-  @ApiParam({ name: 'surveyId', description: 'UUID опроса' })
+  @ApiParam({
+    name: 'surveyId',
+    description: 'UUID опроса',
+    required: true
+  })
   @ApiResponse({ status: 200, description: 'Форма опроса получена' })
   @ApiResponse({ status: 404, description: 'Опрос не найден' })
   @UseGuards(AccessTokenGuard)
@@ -39,10 +47,15 @@ export class ResponsesController {
 
 
   @ApiOperation({ summary: 'Создать ответ на опрос' })
-  @ApiParam({ name: 'surveyId', description: 'UUID опроса' })
+  @ApiParam({
+    name: 'surveyId',
+    description: 'UUID опроса',
+    required: true
+  })
   @ApiBody({
     description: 'Данные для создания полного ответа на опрос',
     type: CreateResponseDto,
+    required: true
   })
   @ApiResponse({ status: 201, description: 'Ответ сохранен' })
   @ApiResponse({ status: 400, description: 'Ошибка валидации' })

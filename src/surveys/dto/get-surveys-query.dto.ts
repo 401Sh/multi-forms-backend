@@ -34,8 +34,8 @@ export class GetSurveysQueryDto {
   pageSize: number;
 
   @ApiPropertyOptional({
-    description: 'Поле для сортировки (например, "createdAt" или "-createdAt" для сортировки по убыванию)',
-    example: 'DESC:createdAt',
+    description: 'Поле для сортировки в формате: имяПоля:направлениеСортировки (сортировка может быть ASC или DESC)',
+    example: 'createdAt:DESC',
   })
   @IsString()
   @IsOptional()

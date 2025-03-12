@@ -14,10 +14,15 @@ export class QuestionsController {
   constructor(private questionsService: QuestionsService) {}
 
   @ApiOperation({ summary: 'Создать новый вопрос в опросе' })
-  @ApiParam({ name: 'surveyId', description: 'UUID опроса' })
+  @ApiParam({
+    name: 'surveyId',
+    description: 'UUID опроса',
+    required: true
+  })
   @ApiBody({
     description: 'Данные для создания вопроса',
     type: CreateQuestionDto,
+    required: true
   })
   @ApiResponse({ status: 201, description: 'Вопрос успешно создан' })
   @ApiResponse({ status: 400, description: 'Ошибка валидации' })
@@ -33,7 +38,11 @@ export class QuestionsController {
 
 
   @ApiOperation({ summary: 'Обновить существующий вопрос' })
-  @ApiParam({ name: 'questionId', description: 'UUID вопроса' })
+  @ApiParam({
+    name: 'questionId',
+    description: 'UUID вопроса',
+    required: true
+  })
   @ApiBody({
     description: 'Данные для обновления вопроса',
     type: UpdateQuestionDto,
@@ -53,7 +62,11 @@ export class QuestionsController {
 
 
   @ApiOperation({ summary: 'Удалить вопрос' })
-  @ApiParam({ name: 'questionId', description: 'UUID вопроса' })
+  @ApiParam({
+    name: 'questionId',
+    description: 'UUID вопроса',
+    required: true
+  })
   @ApiResponse({ status: 204, description: 'Вопрос успешно удалён' })
   @ApiResponse({ status: 403, description: 'Доступ запрещён' })
   @ApiResponse({ status: 404, description: 'Вопрос не найден' })
