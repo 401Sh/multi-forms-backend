@@ -7,8 +7,8 @@ type RefreshCookie = {
 };
 
 export const refreshCookieOptions: RefreshCookie = {
-  httpOnly: false,
-  secure: false,
+  httpOnly: true,
+  secure: true,
   sameSite: "strict",
   path: '/',
   maxAge: 604800000

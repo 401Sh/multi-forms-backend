@@ -1,0 +1,53 @@
+services:
+  app:
+    build: .
+    container_name: forms-backend
+    environment:
+      - NODE_ENV=production
+
+      # db настройки
+      - DB_HOST=mariaDB
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+
+      # настройки проекта
+      - HOST=0.0.0.0
+      - PORT=${PORT}
+      - LOG_LEVEL=${LOG_LEVEL}
+
+      # настройки jwt
+      - ACCESS_TOKEN_TTL=${ACCESS_TOKEN_TTL}
+      - REFRESH_TOKEN_TTL=${REFRESH_TOKEN_TTL}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mariadb
+    container_name: mariaDB
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+
+  adminer:
+    image: adminer
+    container_name: adminer-ui
+    ports:
+      - "8080:8080"
+    restart: always
+
+volumes:
+  db_data:
