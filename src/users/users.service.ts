@@ -16,6 +16,11 @@ export class UsersService {
   ) {}
 
   
+  /**
+   * Create new user in DB
+   * @param {CreateUserDto} createUserDto User login and password
+   * @returns {Promise<UserEntity>} Created user
+   */
   async create(createUserDto: CreateUserDto): Promise<UserEntity>{
     const isAvailable = await this.isLoginAvailable(createUserDto.login);
     if (!isAvailable) {
@@ -37,6 +42,10 @@ export class UsersService {
   };
 
 
+  /**
+   * Find all existing users
+   * @returns {Promise<UserEntity[]>} Finded users entities
+   */
   async findAll(): Promise<UserEntity[]> {
     UsersService.logger.log(`Finding all users`);
     const users = await this.userRepository
@@ -47,6 +56,11 @@ export class UsersService {
   };
 
 
+  /**
+   * Find user in DB by id
+   * @param {string} id User uuid
+   * @returns {Promise<UserEntity>} Finded user entity
+   */
   async findById(id: string): Promise<UserEntity> {
     const user = await this.userRepository
       .createQueryBuilder('users')
@@ -64,6 +78,11 @@ export class UsersService {
   };
 
 
+  /**
+   * Find user in DB by login
+   * @param {string} login User login
+   * @returns {Promise<UserEntity>} Finded user entity
+   */
   async findByLogin(login: string): Promise<UserEntity> {
     const user = await this.userRepository
       .createQueryBuilder('users')
@@ -81,7 +100,13 @@ export class UsersService {
   }
 
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  /**
+   * Update user data in DB
+   * @param {string} id User uuid
+   * @param {UpdateUserDto} updateUserDto Data for update
+   * @returns {Promise<UserEntity | null>} Updated user entity
+   */
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity | null> {
     // Check user
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
@@ -109,6 +134,11 @@ export class UsersService {
   };
 
 
+  /**
+   * Delete user in DB by id
+   * @param {string} id User uuid
+   * @returns {Promise<DeleteResult>} Deleting result
+   */
   async deleteById(id: string): Promise<DeleteResult> {
     UsersService.logger.log(`Deleting user with id: ${id}`);
     const deleteResult = await this.userRepository.delete({ id: id });
@@ -122,13 +152,23 @@ export class UsersService {
   };
 
 
+  /**
+   * Check if user login is free in DB
+   * @param {string} login Verifiable login
+   * @returns {Promise<boolean>} True if login is free
+   */
   async isLoginAvailable(login: string): Promise<boolean> {
     const existingUser = await this.userRepository.findOne({ where: { login } });
     return !existingUser;
   };
 
 
-  hashData(data: string) {
+  /**
+   * Hash data
+   * @param {string} data Data to hash
+   * @returns {Promise<string>} Hashed string
+   */
+  hashData(data: string): Promise<string> {
     return argon2.hash(data);
   };
 };

@@ -30,6 +30,11 @@ export class ResponsesService {
   ) {}
 
 
+  /**
+   * Find form for response
+   * @param {string} surveyId Survey id
+   * @returns {Promise<SurveyEntity>} Finded form
+   */
   async findForm(surveyId: string) {
     const form = await this.surveysService.findForm(surveyId);
     
@@ -43,6 +48,13 @@ export class ResponsesService {
 
 
   // Abomination function - needs to rework
+  /**
+   * Create response in DB with score calculation belonging to the user and referring to the survey
+   * @param {string} surveyId Survey uuid
+   * @param {string} userId User uuid
+   * @param {CreateResponseDto} data Response data
+   * @returns {Promise<ResponseEntity>} Created response
+   */
   async create(surveyId: string, userId: string, data: CreateResponseDto) {
     const questionIds = data.answers.map(d => d.questionId);
     const questions = await this.questionsService.findSurveyQuestionsByIds(
@@ -70,6 +82,13 @@ export class ResponsesService {
 
 
   // Abomination function - needs to rework
+  /**
+   * Create answers with choosed options for response by givin data and calc score
+   * @param {ResponseEntity} response Respinse uuid
+   * @param {QuestionEntity[]} questions Question array for comparison
+   * @param {CreateAnswerDto[]} data Response answers data
+   * @returns Created Answers and current response score
+   */
   private async createAnswersAndCalcScore(
     response: ResponseEntity,
     questions: QuestionEntity[],
@@ -111,6 +130,13 @@ export class ResponsesService {
 
 
   // Abomination function - needs to rework
+  /**
+   * Create choosed options for question by givin data and calc score
+   * @param {AnswerEntity} answer Answer uuid
+   * @param {string[]} data Choosed options uuids
+   * @param {QuestionOptionEntity[]} options Option array for comparison
+   * @returns Created AnswerOptions and current answer score
+   */
   private async createOptionsAndCalcScore(
     answer: AnswerEntity,
     data: string[],
@@ -140,6 +166,11 @@ export class ResponsesService {
   };
 
 
+  /**
+   * Find all responses belonging to the survey
+   * @param {string} surveyId Survey uuid
+   * @returns {Promise<ResponseEntity[]>} Finded responses
+   */
   async findResponses(surveyId: string) {
     ResponsesService.logger.log(`Finding all responses for survey: ${surveyId}`);
     

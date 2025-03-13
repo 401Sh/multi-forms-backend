@@ -25,6 +25,14 @@ export class AuthService {
   ) {}
 
 
+  /**
+   * Sign up user with creating session and tokens
+   * @param {CreateUserDto} createUserDto User login and password
+   * @param {string} ua User agent
+   * @param {string} ip User ip address
+   * @param {string} fp User fingerprint
+   * @returns {Promise<{accessToken: string; refreshToken: string; }>} Created tokens
+   */
   async signUp(createUserDto: CreateUserDto, ua: string, ip: string, fp: string) {
     // Create user
     const newUser = await this.usersService.create(
@@ -44,6 +52,14 @@ export class AuthService {
   };
 
 
+  /**
+   * Sign in user with creating session and tokens
+   * @param {AuthDto} authDto User login and password
+   * @param {string} ua User agent
+   * @param {string} ip User ip address
+   * @param {string} fp User fingerprint
+   * @returns {Promise<{accessToken: string; refreshToken: string; }>} Created tokens
+   */
   async signIn(authDto: AuthDto, ua: string, ip: string, fp: string) {
     // Check if user exists
     const user = await this.usersService.findByLogin(authDto.login);
@@ -75,17 +91,36 @@ export class AuthService {
   };
 
 
+  /**
+   * Create simple fingerprint for user in hashed form
+   * @param {string} ip User ip address
+   * @param {string} ua User agent
+   * @returns {Promise<string>} Created fingerprint
+   */
   async generateFingerprint(ip: string, ua: string): Promise<string> {
     const hash = await argon2.hash(ip + ua);
     return hash;
   };
 
 
-  hashData(data: string) {
+  /**
+   * Hash data
+   * @param {string} data Data to hash
+   * @returns {Promise<string>} Hashed string
+   */
+  hashData(data: string): Promise<string> {
     return argon2.hash(data);
   };
 
 
+  /**
+   * Create user session in DB
+   * @param {UserEntity} user User entity
+   * @param {string} refreshToken Working refresh token
+   * @param {string} userAgent User agent
+   * @param {string} ip User ip address
+   * @param {string} fingerprint User fingerprint
+   */
   async createRefreshSession(
     user: UserEntity,
     refreshToken: string,
@@ -110,6 +145,15 @@ export class AuthService {
   };
 
 
+  /**
+   * Refresh user tokens with creating new session
+   * @param {string} userId User uuid
+   * @param {string} refreshToken Working refresh token
+   * @param {string} userAgent User agent
+   * @param {string} ip User ip address
+   * @param {string} fingerprint User fingerprint
+   * @returns {Promise<{accessToken: string; refreshToken: string; }>} New tokens
+   */
   async refreshTokens(
     userId: string,
     refreshToken: string,
@@ -168,6 +212,13 @@ export class AuthService {
   };
 
 
+  /**
+   * Find session in DB which belonging to specific user
+   * with specific fingerprint
+   * @param {UserEntity} user User uuid
+   * @param {string} fp User fingerprint
+   * @returns {Promise<RefreshSessionEntity | null>} Finded session
+   */
   async findRefreshSession(user: UserEntity, fp: string){
     const session = await this.refreshSessionRepository.findOne(
       { 
@@ -180,6 +231,12 @@ export class AuthService {
   };
 
 
+  /**
+   * Create access and refresh tokens for given user
+   * @param {string} userId User uuid
+   * @param {string} login User login
+   * @returns {Promise<{accessToken: string; refreshToken: string; }>} Created tokens
+   */
   async getTokens(userId: string, login: string) {
     const accessSecret = this.configService.get<string>('JWT_ACCESS_SECRET')
     const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET')
@@ -224,6 +281,13 @@ export class AuthService {
   };
 
 
+  /**
+   * Delete refresh session in DB which belonging to specific user
+   * with specific fingerprint
+   * @param {string} userId User uuid
+   * @param {string} fp User fingerprint
+   * @returns {Promise<DeleteResult>} Deleting result
+   */
   async deleteRefreshSession(userId: string, fp: string){
     AuthService.logger.log(`Deleting user ${userId} session`);
     const deleteResult = await this.refreshSessionRepository.delete(
@@ -242,6 +306,11 @@ export class AuthService {
   }
 
 
+  /**
+   * Parse given ttl code and return Date
+   * @param {string} ttl TTL string to parse
+   * @returns {Date} Parsed TTL
+   */
   private static parseTTL(ttl: string): Date {
     const ttlUnit = ttl.slice(-1);
     const ttlValue = parseInt(ttl.slice(0, -1), 10);

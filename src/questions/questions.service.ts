@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { DataSource, In, QueryRunner, Repository } from 'typeorm';
+import { DataSource, DeleteResult, In, QueryRunner, Repository } from 'typeorm';
 import { QuestionEntity } from './entities/question.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateQuestionDto } from './dto/create-question.dto';
@@ -21,6 +21,12 @@ export class QuestionsService {
   ) {}
 
   
+  /**
+   * Question create transaction
+   * @param {string} surveyId Survey uuid
+   * @param {CreateQuestionDto} data Question mandatory data
+   * @returns {Promise<QuestionEntity>} Created question
+   */
   async createQuestionTransaction(surveyId: string, data: CreateQuestionDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -81,6 +87,13 @@ export class QuestionsService {
   };
 
 
+  /**
+   * Complex update transaction for question with other questions position rearrangement if required,
+   * options replacing and survey points recalculation
+   * @param {string} id Question uuid
+   * @param {UpdateQuestionDto} data New question data
+   * @returns {Promise<QuestionEntity | null>} Updated question
+   */
   async updateQuestionTransaction(id: string, data: UpdateQuestionDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -174,6 +187,12 @@ export class QuestionsService {
   };
 
 
+  /**
+   * Update question data in DB
+   * @param {QueryRunner} queryRunner QuerryRunner for Typeorm transaction
+   * @param {QuestionEntity} question Question entity
+   * @param {UpdateQuestionDto} data New question data
+   */
   async updateQuestionData(
     queryRunner: QueryRunner,
     question: QuestionEntity,
@@ -192,6 +211,12 @@ export class QuestionsService {
   };
 
 
+  /**
+   * Update question options in DB. All old options in DB will be deleted
+   * @param {QueryRunner} queryRunner QuerryRunner for Typeorm transaction
+   * @param {QuestionEntity} question Question entity
+   * @param {UpdateQuestionOptionDto[]} options All question options include both new and old
+   */
   private async updateQuestionOptions(
     queryRunner: QueryRunner,
     question: QuestionEntity,
@@ -237,6 +262,13 @@ export class QuestionsService {
   };
 
 
+  /**
+   * Update survey total points
+   * @param {QueryRunner} queryRunner QuerryRunner for Typeorm transaction
+   * @param {string} surveyId Survey uuid
+   * @param {number} newPoints New calculated points
+   * @param {number} oldPoints old survey points
+   */
   private async updateSurveyTotalPoints(
     queryRunner: QueryRunner,
     surveyId: string,
@@ -256,6 +288,15 @@ export class QuestionsService {
   };
 
 
+  /**
+   * Move questions higher or lower of given new position
+   * until old position. Needs to prevent gaps between questions
+   * and also to free new position
+   * @param {QueryRunner} queryRunner QuerryRunner for Typeorm transaction
+   * @param {string} surveyId Survey uuid
+   * @param {number} oldPosition Old question position in survey
+   * @param {number} newPosition New question position in survey
+   */
   private async reorderPositions(
     queryRunner: QueryRunner,
     surveyId: string,
@@ -288,6 +329,11 @@ export class QuestionsService {
   };
 
 
+  /**
+   * Delete question in DB by id
+   * @param {string} id Question uuid
+   * @returns {DeleteResult}
+   */
   async deleteById(id: string) {
     QuestionsService.logger.log(`Deleting question with id: ${id}`);
     const deleteResult = await this.questionRepository.delete({ id: id });
@@ -301,6 +347,12 @@ export class QuestionsService {
   };
 
 
+  /**
+   * Move all survey questions under given position
+   * @param {QueryRunner} queryRunner QuerryRunner for Typeorm transaction
+   * @param {string} surveyId Survey uuid
+   * @param {number} position position which needs to be freed
+   */
   private async moveDownPositions(
     queryRunner: QueryRunner,
     surveyId: string,
@@ -318,6 +370,15 @@ export class QuestionsService {
   };
 
 
+  /**
+   * Find highest question position in survey and if given position
+   * is too high, then return highest position in DB + 1, otherwise
+   * returns given position
+   * @param {QueryRunner} queryRunner QuerryRunner for Typeorm transaction
+   * @param {string} surveyId Survey uuid
+   * @param {number} newPosition Position to check
+   * @returns {Promise<number>} Given position or highest position in DB + 1
+   */
   private async checkQuestionPosition(
     queryRunner: QueryRunner,
     surveyId: string,
@@ -340,6 +401,12 @@ export class QuestionsService {
   };
 
 
+  /**
+   * Finding all questions that is belongs to the survey by theirs ids
+   * @param {string} surveyId Survey uuid
+   * @param {string[]} questionIds Questions uuid array
+   * @returns {Promise<QuestionEntity[]>} Finded questions
+   */
   async findSurveyQuestionsByIds(surveyId: string, questionIds: string[]) {
     const questions = await this.questionRepository.find({
       where: {

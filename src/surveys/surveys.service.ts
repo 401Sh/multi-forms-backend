@@ -25,6 +25,11 @@ export class SurveysService {
   ) {}
 
 
+  /**
+   * Create survey in DB related to existing user
+   * @param {string} id User (survey author) uuid
+   * @returns {Promise<SurveyEntity>} Created survey
+   */
   async createSurvey(id: string): Promise<SurveyEntity> {
     const user = await this.usersService.findById(id)
 
@@ -37,6 +42,11 @@ export class SurveysService {
   };
 
 
+  /**
+   * Find survey in DB by id
+   * @param {string} id Survey uuid
+   * @returns {Promise<SurveyEntity>} Finded survey entity
+   */
   async findById(id: string): Promise<SurveyEntity> {
     const survey = await this.surveyRepository
       .createQueryBuilder("surveys")
@@ -62,6 +72,12 @@ export class SurveysService {
   };
 
 
+  /**
+   * Finding surveys with filtration and sorting
+   * @param {GetSurveysQueryDto} query Sorting and filtration params
+   * @param {?SurveyOptions} [options] filtration by userId, access or isPublished fields
+   * @returns Finded surveys with additional information: amount, pages amnount and current page
+   */
   async findSurveys(query: GetSurveysQueryDto, options?: SurveyOptions) {
     const { search, page = 1, pageSize = 10, ordering } = query;
 
@@ -139,6 +155,12 @@ export class SurveysService {
   };
 
 
+  /**
+   * Update survey data in DB
+   * @param {string} id Survey uuid
+   * @param {UpdateSurveyDto} UpdateSurveyDto Update data for survey
+   * @returns {Promise<SurveyEntity | null>} Updated survey
+   */
   async update(id: string, UpdateSurveyDto: UpdateSurveyDto) {
     SurveysService.logger.log(`Updating survey with id: ${id}`);
     await this.surveyRepository.update({ id: id }, UpdateSurveyDto);
@@ -148,6 +170,11 @@ export class SurveysService {
   }
 
 
+  /**
+   * Delete survey in DB by id
+   * @param {string} id Survey uuid
+   * @returns {Promise<DeleteResult>} Deleting result
+   */
   async deleteById(id: string): Promise<DeleteResult> {
     SurveysService.logger.log(`Deleting survey with id: ${id}`);
     const deleteResult = await this.surveyRepository.delete({ id: id });
@@ -161,19 +188,46 @@ export class SurveysService {
   };
 
 
-  async findForm(id: string) {
-    const survey = await this.surveyRepository
+  /**
+   * Find existing survey in DB by id without some data, like answers, timestamps and etc
+   * @param {string} id Survey uuid
+   * @returns {Promise<SurveyEntity>} Finded survey entity
+   */
+  async findForm(id: string): Promise<SurveyEntity> {
+    // Can't fix bug - typeorm always include field isCorrect in option entity
+    // Work both in query builder and findOne
+    // User can find correct option in Network
+    const form = await this.surveyRepository
       .createQueryBuilder("survey")
-      .leftJoin("survey.questions", "question")
-      .leftJoin("question.questionOptions", "option")
       .where("survey.id = :id", { id })
+      .leftJoin("survey.questions", "questions")
+      .leftJoin("questions.questionOptions", "questionOptions")
+      .addSelect([
+        "survey.id",
+        "survey.name",
+        "survey.isPublished",
+        "survey.description",
+        "survey.totalPoints",
+        "questions.id",
+        "questions.name",
+        "questions.page",
+        "questions.position",
+        "questions.questionText",
+        "questions.isMandatory",
+        "questions.points",
+        "questions.type",
+        "questionOptions.id",
+        "questionOptions.position",
+        "questionOptions.points",
+        "questionOptions.text"
+      ])
       .getOne();
 
-    if (!survey) {
-      SurveysService.logger.log(`Cannot find survey form ${id}. No such survey`);
-      throw new NotFoundException(`Survey with id ${id} not found`);
+    if (!form) {
+      SurveysService.logger.log(`Cannot find form form ${id}. No such survey`);
+      throw new NotFoundException(`Form with id ${id} not found`);
     };
 
-    return survey;
+    return form;
   };
 };
