@@ -13,5 +13,3 @@ export const refreshCookieOptions: RefreshCookie = {
   path: '/',
   maxAge: 604800000
 };
-
-// лучше будет потом переработать на использование nest конфигуратора
