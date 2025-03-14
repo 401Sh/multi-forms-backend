@@ -403,12 +403,16 @@ export class QuestionsService {
 
   /**
    * Finding all questions that is belongs to the survey by theirs ids
+   * @param {QueryRunner} queryRunner QuerryRunner for Typeorm transaction
    * @param {string} surveyId Survey uuid
    * @param {string[]} questionIds Questions uuid array
    * @returns {Promise<QuestionEntity[]>} Finded questions
    */
-  async findSurveyQuestionsByIds(surveyId: string, questionIds: string[]) {
-    const questions = await this.questionRepository.find({
+  async findSurveyQuestionsByIds(
+    queryRunner: QueryRunner, surveyId: string, questionIds: string[]) {
+    const questions = await queryRunner.manager.find(
+      QuestionEntity,
+      {
       where: {
         id: In(questionIds),
         survey: { id: surveyId }

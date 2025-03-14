@@ -1,10 +1,9 @@
-import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ResponseEntity } from './entities/response.entity';
-import { Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { CreateResponseDto } from './dto/create-response.dto';
 import { SurveysService } from 'src/surveys/surveys.service';
-import { omit } from 'lodash';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { AnswerEntity } from './entities/answer.entity';
 import { QuestionsService } from 'src/questions/questions.service';
@@ -12,6 +11,7 @@ import { QuestionOptionEntity } from 'src/questions/entities/question-option.ent
 import { QuestionEntity } from 'src/questions/entities/question.entity';
 import { QuestionType } from 'src/questions/enums/question.enum';
 import { AnswerOptionEntity } from './entities/answer-option.entity';
+import { SurveyEntity } from 'src/surveys/entities/survey.entity';
 
 @Injectable()
 export class ResponsesService {
@@ -21,12 +21,10 @@ export class ResponsesService {
     @InjectRepository(ResponseEntity)
     private responseRepository: Repository<ResponseEntity>,
     @InjectRepository(AnswerEntity)
-    private answerRepository: Repository<AnswerEntity>,
-    @InjectRepository(AnswerOptionEntity)
-    private answerOptionRepository: Repository<AnswerOptionEntity>,
 
     private surveysService: SurveysService,
-    private questionsService: QuestionsService
+    private questionsService: QuestionsService,
+    private readonly dataSource: DataSource
   ) {}
 
 
@@ -49,47 +47,79 @@ export class ResponsesService {
 
   // Abomination function - needs to rework
   /**
-   * Create response in DB with score calculation belonging to the user and referring to the survey
+   * Create response transaction with score calculation
+   * belonging to the user and referring to the survey
    * @param {string} surveyId Survey uuid
    * @param {string} userId User uuid
    * @param {CreateResponseDto} data Response data
    * @returns {Promise<ResponseEntity>} Created response
    */
   async create(surveyId: string, userId: string, data: CreateResponseDto) {
-    const questionIds = data.answers.map(d => d.questionId);
-    const questions = await this.questionsService.findSurveyQuestionsByIds(
-      surveyId, questionIds
-    );
-    const survey = await this.surveysService.findById(surveyId);
-    
-    const response = this.responseRepository.create({
-      survey: { id: surveyId },
-      user: { id: userId },
-      totalPoints: survey.totalPoints,
-      score: 0
-    });
-    await this.responseRepository.save(response);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    ResponsesService.logger.log('Started Response create transaction');
 
-    const { createdAnswers, score } = await this.createAnswersAndCalcScore(
-      response, questions, data.answers
-    );
+    try {
+      const questionIds = data.answers.map(d => d.questionId);
+      const questions = await this.questionsService.findSurveyQuestionsByIds(
+        queryRunner, surveyId, questionIds
+      );
+      const survey = await queryRunner.manager.findOne(
+        SurveyEntity, { where: { id: surveyId } }
+      );
 
-    response.answers = createdAnswers;
-    response.score = score;
+      if (!survey) {
+        ResponsesService.logger.log(`No survey with id: ${surveyId}`);
+        throw new BadRequestException('Survey does not exist');
+      };
+      
+      const response = queryRunner.manager.create(
+        ResponseEntity,
+        {
+        survey: { id: surveyId },
+        user: { id: userId },
+        totalPoints: survey.totalPoints,
+        score: 0
+        }
+      );
+      await queryRunner.manager.save(ResponseEntity, response);
 
-    return this.responseRepository.save(response);
+      const { createdAnswers, score } = await this.createAnswersAndCalcScore(
+        queryRunner, response, questions, data.answers
+      );
+
+      response.answers = createdAnswers;
+      response.score = score;
+
+      const created_response = await queryRunner.manager.save(ResponseEntity, response);
+
+      await queryRunner.commitTransaction();
+      ResponsesService.logger.log('Response create transaction has been successfully ended');
+
+      return created_response;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      ResponsesService.logger.log('Response create transaction has failed and was rolled back');
+      ResponsesService.logger.error(`Response create transaction failed: ${error.message}`, error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    };
   };
 
 
   // Abomination function - needs to rework
   /**
    * Create answers with choosed options for response by givin data and calc score
+   * @param {QueryRunner} queryRunner QuerryRunner for Typeorm transaction
    * @param {ResponseEntity} response Respinse uuid
    * @param {QuestionEntity[]} questions Question array for comparison
    * @param {CreateAnswerDto[]} data Response answers data
    * @returns Created Answers and current response score
    */
   private async createAnswersAndCalcScore(
+    queryRunner: QueryRunner,
     response: ResponseEntity,
     questions: QuestionEntity[],
     data: CreateAnswerDto[]
@@ -101,27 +131,30 @@ export class ResponsesService {
       const question = questions.find(q => q.id === d.questionId);
       if (!question) continue;
 
-      const answer = this.answerRepository.create({
+      const answer = queryRunner.manager.create(
+        AnswerEntity,
+        {
         response,
         question: { id: question.id } as QuestionEntity,
         answerText: question.type === QuestionType.TEXT ? d.answerText : undefined
-      });
+        }
+      );
 
       if (question.type === QuestionType.TEXT) {
         if (question.answer === d.answerText) {
           score += question.points;
         };
       } else {
-        await this.answerRepository.save(answer);
+        await queryRunner.manager.save(AnswerEntity, answer);
 
         const { createdAnswerOptions, additionalScore } = await this.createOptionsAndCalcScore(
-          answer, d.answerOptions, question.questionOptions
+          queryRunner, answer, d.answerOptions, question.questionOptions
         );
         answer.answerOptions = createdAnswerOptions;
         score += additionalScore;
       };
 
-      await this.answerRepository.save(answer);
+      await queryRunner.manager.save(AnswerEntity, answer);
       answers.push(answer);
     };
 
@@ -138,6 +171,7 @@ export class ResponsesService {
    * @returns Created AnswerOptions and current answer score
    */
   private async createOptionsAndCalcScore(
+    queryRunner: QueryRunner,
     answer: AnswerEntity,
     data: string[],
     options: QuestionOptionEntity[]
@@ -149,16 +183,19 @@ export class ResponsesService {
       const option = options.find(o => o.id === d);
       if (!option) continue;
 
-      const answerOption = this.answerOptionRepository.create({
+      const answerOption = queryRunner.manager.create(
+        AnswerOptionEntity,
+        {
         answer: { id: answer.id },
         questionOption: { id: option.id }
-      });
+        }
+      );
 
       if (option.isCorrect) {
         score += option.points;
       };
 
-      await this.answerOptionRepository.save(answerOption);
+      await queryRunner.manager.save(AnswerOptionEntity, answerOption);
       answerOptions.push(answerOption);
     };
 
