@@ -1,7 +1,7 @@
 {
-  "name": "multi-page-forms-backend",
+  "name": "multi-forms-backend",
   "version": "0.0.1",
-  "description": "A Node.js backend setup, built with NestJS, designed to manage multi-page form submissions.",
+  "description": "A Node.js backend setup, built with NestJS, designed to manage multi-forms submissions.",
   "main": "./build/index.js",
   "scripts": {
     "build": "nest build",

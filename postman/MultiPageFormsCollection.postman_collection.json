@@ -1,9 +1,11 @@
 {
 	"info": {
 		"_postman_id": "65b9c818-5fb7-4e75-83b8-e6c12736541f",
-		"name": "MultiPageFormsCollection",
+		"name": "MultiFormsCollection",
+		"description": "Коллекция запросов для каждого роута студентческого проекта по созданию упрощенной версии серверной части аналога сайта яндекс форм",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "36663044"
+		"_exporter_id": "36663044",
+		"_collection_link": "https://test55-2882.postman.co/workspace/7a5e7312-c10a-4177-8d85-195063dfebbd/collection/36663044-65b9c818-5fb7-4e75-83b8-e6c12736541f?action=share&source=collection_link&creator=36663044"
 	},
 	"item": [
 		{
@@ -217,7 +219,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Запросы на регистрацию, вход и выход из аккаунта, а также на обновление jwt токенов.  \nRefresh токен хранится в защищенных куки, а access токен передается в теле ответа."
 		},
 		{
 			"name": "User",
@@ -399,7 +402,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Запросы на обновление/удаление своего аккаунта, а также получение данных о пользователях"
 		},
 		{
 			"name": "Survey",
@@ -485,7 +489,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"page\": 1,\r\n    \"position\": 10,\r\n    \"name\": \"Вопрос 1\",\r\n    \"isMandatory\": true,\r\n    \"questionText\": \"Пищевой продукт, выпекаемый из муки\",\r\n    \"questionOptions\": [\r\n        {\r\n            \"position\": 1,\r\n            \"text\": \"Хелб\",\r\n            \"isCorrect\": false,\r\n            \"points\": 0\r\n        },\r\n        {\r\n            \"position\": 2,\r\n            \"text\": \"Хлеб\",\r\n            \"isCorrect\": true,\r\n            \"points\": 25\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"position\": 10,\r\n    \"name\": \"Вопрос 1\",\r\n    \"isMandatory\": true,\r\n    \"questionText\": \"Пищевой продукт, выпекаемый из муки\",\r\n    \"questionOptions\": [\r\n        {\r\n            \"position\": 1,\r\n            \"text\": \"Хелб\",\r\n            \"isCorrect\": false,\r\n            \"points\": 0\r\n        },\r\n        {\r\n            \"position\": 2,\r\n            \"text\": \"Хлеб\",\r\n            \"isCorrect\": true,\r\n            \"points\": 25\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -559,7 +563,8 @@
 							},
 							"response": []
 						}
-					]
+					],
+					"description": "Запросы на создание, обновление и удаление вопросов анкеты. Получение вопроса отсутствует. Просмотреть созданные вопросы можно в данных анкеты, к которой данный вопрос принадлежит"
 				},
 				{
 					"name": "CreateSurvey",
@@ -790,7 +795,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Запросы для работы с анкетами. Полный CRUD для своих анкет, а также просмотр публичных и собственных анкет"
 		},
 		{
 			"name": "Response",
@@ -884,7 +890,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"answers\": [\r\n        {\r\n            \"questionId\": \"7450b0c3-0d86-4d75-b9c5-3e8fdcfacbe0\",\r\n            \"answerText\": \"хлеб\"\r\n        },\r\n        {\r\n            \"questionId\": \"7727c2e8-6534-4ee7-a5d3-f1dc4c0fb5fe\",\r\n            \"answerOptions\": [\r\n                \"b23b06ac-e9a0-4855-b748-cb4640b6192f\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+							"raw": "{\r\n    \"answers\": [\r\n        {\r\n            \"questionId\": \"813ce125-6b49-4b86-882e-62b8f7953b6c\",\r\n            \"answerText\": \"хлеб11\"\r\n        },\r\n        {\r\n            \"questionId\": \"95ae3746-7a89-411e-976c-46d2799f52d1\",\r\n            \"answerOptions\": [\r\n                \"1ae1a52e-80dd-47f1-88be-e723c7d68665\"\r\n            ]\r\n        }\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -912,7 +918,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Запросы на создание ответа и просмотр созданных ответов на анкету. Запрос на получение анкеты похож на запрос из серии survey, но данные в ином формате, где определенные поля (ответы и тд) отсутствуют."
 		}
 	],
 	"event": [

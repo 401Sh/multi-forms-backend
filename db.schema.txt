@@ -16,7 +16,6 @@ Table Question {
   id int [primary key]
   surveyId int [not null]
   name varchar
-  page int [not null]
   position int [default: 1]
   questionText varchar
   isMandatory boolean [default: false]

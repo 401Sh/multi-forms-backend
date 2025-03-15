@@ -12,14 +12,6 @@ export class UpdateQuestionDto {
   name: string;
 
   @ApiPropertyOptional({
-    description: 'Номер страницы, на которой должен находиться вопрос',
-    example: 1
-  })
-  @IsInt()
-  @IsOptional()
-  page: number;
-
-  @ApiPropertyOptional({
     description: 'Позиция на которой должен находиться вопрос в опросе',
     example: 2
   })
