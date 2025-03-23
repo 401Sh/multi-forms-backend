@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import * as cookieParser from 'cookie-parser';
 import { Logger, LogLevel, ValidationPipe } from '@nestjs/common';
+import * as cors from "cors";
 
 dotenv.config();
 
@@ -18,6 +19,12 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useLogger(logLevels);
   app.use(cookieParser());
+
+  app.use(cors({
+    origin: '*', // Разрешаем фронтенд
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization"
+  }));
 
   // Enable global validation
   app.useGlobalPipes(new ValidationPipe({
