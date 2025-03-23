@@ -5,7 +5,7 @@ export class CreateUserDto {
   @ApiProperty({ description: 'Логин пользователя', minLength: 4 })
   @IsNotEmpty({ message: 'Login is required' })
   @MinLength(4, { message: 'Login must be larger then 3 characters' })
-  @Matches(/^[a-zA-Z0-9]+$/, { message: 'Login must be a without spaces and special characers' })
+  @Matches(/^[a-zA-Z0-9_\-]+$/, { message: 'Login must be without spaces and special characers' })
   login: string;
 
   @ApiProperty({ description: 'Пароль пользователя', minLength: 5 })

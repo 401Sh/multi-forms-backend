@@ -1,8 +1,8 @@
-# Multi page forms backend - NestJS + TypeScript + TypeORM + JWT
+# Multi forms backend - NestJS + TypeScript + TypeORM + JWT
 
 ## Цель проекта
 
-Разработать бэкенд, который будет являться упрощенным аналогом бэкенда Яндекс Форм.
+Разработать бэкенд, который будет являться упрощенным аналогом бэкенда Google Форм.
 
 ### Задачи
 

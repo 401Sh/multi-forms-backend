@@ -11,15 +11,6 @@ export class CreateQuestionDto {
   @IsOptional()
   name: string;
 
-  @ApiPropertyOptional({
-    description: 'Номер страницы, на которой находится вопрос',
-    example: 1
-  })
-  @IsInt()
-  @IsOptional()
-  @Min(1, { message: 'Page cannot be less than 1' })
-  page: number;
-
   @ApiProperty({
     description: 'Позиция вопроса на странице',
     example: 2

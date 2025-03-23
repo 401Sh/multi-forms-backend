@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { DataSource, DeleteResult, In, QueryRunner, Repository } from 'typeorm';
+import { DataSource, In, QueryRunner, Repository } from 'typeorm';
 import { QuestionEntity } from './entities/question.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateQuestionDto } from './dto/create-question.dto';

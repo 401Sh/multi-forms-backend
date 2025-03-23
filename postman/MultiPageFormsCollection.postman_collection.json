@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "65b9c818-5fb7-4e75-83b8-e6c12736541f",
-		"name": "MultiPageFormsCollection",
+		"name": "MultiFormsCollection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "36663044"
 	},
@@ -485,7 +485,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"page\": 1,\r\n    \"position\": 10,\r\n    \"name\": \"Вопрос 1\",\r\n    \"isMandatory\": true,\r\n    \"questionText\": \"Пищевой продукт, выпекаемый из муки\",\r\n    \"questionOptions\": [\r\n        {\r\n            \"position\": 1,\r\n            \"text\": \"Хелб\",\r\n            \"isCorrect\": false,\r\n            \"points\": 0\r\n        },\r\n        {\r\n            \"position\": 2,\r\n            \"text\": \"Хлеб\",\r\n            \"isCorrect\": true,\r\n            \"points\": 25\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"position\": 10,\r\n    \"name\": \"Вопрос 1\",\r\n    \"isMandatory\": true,\r\n    \"questionText\": \"Пищевой продукт, выпекаемый из муки\",\r\n    \"questionOptions\": [\r\n        {\r\n            \"position\": 1,\r\n            \"text\": \"Хелб\",\r\n            \"isCorrect\": false,\r\n            \"points\": 0\r\n        },\r\n        {\r\n            \"position\": 2,\r\n            \"text\": \"Хлеб\",\r\n            \"isCorrect\": true,\r\n            \"points\": 25\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"

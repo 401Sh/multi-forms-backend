@@ -210,7 +210,6 @@ export class SurveysService {
         "survey.totalPoints",
         "questions.id",
         "questions.name",
-        "questions.page",
         "questions.position",
         "questions.questionText",
         "questions.isMandatory",

@@ -19,9 +19,6 @@ export class QuestionEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 255, default: 'Новый вопрос' })
   name: string = 'Новый вопрос';
 
-  @Column({ type: 'integer', default: 1 })
-  page: number = 1;
-
   @Column({ type: 'integer', nullable: false })
   position!: number;
 
