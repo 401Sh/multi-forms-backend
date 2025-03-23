@@ -1,4 +1,4 @@
-import { IsOptional, IsArray } from 'class-validator';
+import { ArrayNotEmpty, IsArray } from 'class-validator';
 import { CreateAnswerDto } from './create-answer.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -20,6 +20,6 @@ export class CreateResponseDto {
     ]
   })
   @IsArray()
-  @IsOptional()
+  @ArrayNotEmpty({ message: 'Answers array is required' })
   answers: CreateAnswerDto[]
 };

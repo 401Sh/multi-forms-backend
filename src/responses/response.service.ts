@@ -61,6 +61,7 @@ export class ResponsesService {
     ResponsesService.logger.log('Started Response create transaction');
 
     try {
+
       const questionIds = data.answers.map(d => d.questionId);
       const questions = await this.questionsService.findSurveyQuestionsByIds(
         queryRunner, surveyId, questionIds
@@ -147,6 +148,10 @@ export class ResponsesService {
       } else {
         await queryRunner.manager.save(AnswerEntity, answer);
 
+        if (!d.answerOptions) {
+          throw new BadRequestException('answerOptions does not exist');
+        };
+        
         const { createdAnswerOptions, additionalScore } = await this.createOptionsAndCalcScore(
           queryRunner, answer, d.answerOptions, question.questionOptions
         );
