@@ -39,6 +39,8 @@ export class GetSurveysQueryDto {
   })
   @IsString()
   @IsOptional()
-  @Matches(/^\S+$/, { message: 'Ordering must be without spaces' })
+  @Matches(/^[a-zA-Z_]+:(ASC|DESC)$/i, {
+    message: 'Ordering must be in the format "field:ASC" or "field:DESC".',
+  })
   ordering?: string;
 };
