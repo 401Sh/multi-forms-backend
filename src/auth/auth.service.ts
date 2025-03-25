@@ -72,7 +72,7 @@ export class AuthService {
       throw new BadRequestException('Password is incorrect');
     };
 
-    const existiingSession = await this.findRefreshSession(user, fp);
+    const existiingSession = await this.findRefreshSession(user.id, fp);
 
     if (existiingSession){
       await this.deleteRefreshSession(user.id, fp);
@@ -134,7 +134,7 @@ export class AuthService {
     const refreshTokenTTL = this.configService.get<string>('REFRESH_TOKEN_TTL') || '3d'
     const ttl = AuthService.parseTTL(refreshTokenTTL);
 
-    await this.refreshSessionRepository.save({
+    const session = await this.refreshSessionRepository.save({
       user,
       refreshToken: hashedRefreshToken,
       userAgent,
@@ -142,6 +142,8 @@ export class AuthService {
       fingerprint,
       expiresAt: ttl
     });
+
+    return session;
   };
 
 
@@ -169,8 +171,8 @@ export class AuthService {
     };
 
     // Verifing refresh token
-    const session = await this.findRefreshSession(user, fingerprint);
-
+    const session = await this.findRefreshSession(user.id, fingerprint);
+    
     if (!session) {
       AuthService.logger.log(`Access denied for user: ${user.id}. No existing session`);
       throw new ForbiddenException('Access Denied');
@@ -195,6 +197,8 @@ export class AuthService {
       throw new ForbiddenException('Access Denied');
     };
 
+    await this.deleteRefreshSession(user.id, fingerprint);
+
     // Create new refreshToken session
     const tokens = await this.getTokens(user.id, user.login);
     await this.createRefreshSession(
@@ -205,8 +209,6 @@ export class AuthService {
       fingerprint,
     );
 
-    await this.deleteRefreshSession(user.id, fingerprint);
-
     AuthService.logger.debug(`Created new jwt tokens for user ${user.id}`);
     return tokens;
   };
@@ -215,18 +217,18 @@ export class AuthService {
   /**
    * Find session in DB which belonging to specific user
    * with specific fingerprint
-   * @param {UserEntity} user User uuid
+   * @param {string} userId User uuid
    * @param {string} fp User fingerprint
    * @returns {Promise<RefreshSessionEntity | null>} Finded session
    */
-  async findRefreshSession(user: UserEntity, fp: string){
+  async findRefreshSession(userId: string, fp: string){
     const session = await this.refreshSessionRepository.findOne(
       { 
-        where: { user: { id: user.id }, fingerprint: fp }
+        where: { user: { id: userId }, fingerprint: fp }
       }
     );
-
-    AuthService.logger.log(`Finded session for user id: ${user.id}`);
+    
+    AuthService.logger.log(`Finded session for user id: ${userId}`);
     return session;
   };
 

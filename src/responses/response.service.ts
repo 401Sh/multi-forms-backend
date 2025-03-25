@@ -20,7 +20,6 @@ export class ResponsesService {
   constructor(
     @InjectRepository(ResponseEntity)
     private responseRepository: Repository<ResponseEntity>,
-    @InjectRepository(AnswerEntity)
 
     private surveysService: SurveysService,
     private questionsService: QuestionsService,
