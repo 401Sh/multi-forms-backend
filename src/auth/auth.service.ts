@@ -39,6 +39,10 @@ export class AuthService {
       { ...createUserDto }
     );
 
+    if (!fp) {
+      fp = await this.generateFingerprint(ip, ua);
+    };
+
     // Create tokens
     const tokens = await this.getTokens(newUser.id, newUser.login);
     await this.createRefreshSession(
@@ -65,6 +69,10 @@ export class AuthService {
     const user = await this.usersService.findByLogin(authDto.login);
 
     if (!user) throw new BadRequestException('User does not exist');
+
+    if (!fp) {
+      fp = await this.generateFingerprint(ip, ua);
+    };
 
     // Verify password
     const verifiedPassword = await argon2.verify(user.password, authDto.password);
@@ -168,6 +176,10 @@ export class AuthService {
     if (!user) {
       AuthService.logger.log(`Access denied for user id: ${userId}. No such user`);
       throw new ForbiddenException('Access Denied');
+    };
+
+    if (!fingerprint) {
+      fingerprint = await this.generateFingerprint(ip, userAgent);
     };
 
     // Verifing refresh token
