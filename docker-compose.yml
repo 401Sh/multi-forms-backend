@@ -17,6 +17,10 @@ services:
       - PORT=${PORT}
       - LOG_LEVEL=${LOG_LEVEL}
 
+      # настройки сайта
+      - SITE_HOST=${SITE_HOST}
+      - SITE_PORT=${SITE_PORT}
+
       # настройки jwt
       - ACCESS_TOKEN_TTL=${ACCESS_TOKEN_TTL}
       - REFRESH_TOKEN_TTL=${REFRESH_TOKEN_TTL}
