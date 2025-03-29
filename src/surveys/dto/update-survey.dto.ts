@@ -9,7 +9,7 @@ export class UpdateSurveyDto {
   })
   @IsString()
   @IsOptional()
-  name: string;
+  name?: string;
 
   @ApiPropertyOptional({
     description: 'Описание опроса',
@@ -17,7 +17,7 @@ export class UpdateSurveyDto {
   })
   @IsString()
   @IsOptional()
-  description: string;
+  description?: string;
 
   @ApiPropertyOptional({
     description: 'Опубликован ли опрос',
@@ -25,7 +25,7 @@ export class UpdateSurveyDto {
   })
   @IsBoolean()
   @IsOptional()
-  isPublished: boolean;
+  isPublished?: boolean;
 
   @ApiPropertyOptional({
     description: 'Доступ к опросу: link или public',
@@ -34,5 +34,5 @@ export class UpdateSurveyDto {
   })
   @IsEnum(SurveyAccess)
   @IsOptional()
-  access: SurveyAccess;
+  access?: SurveyAccess;
 };

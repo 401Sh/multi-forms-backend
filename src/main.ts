@@ -4,11 +4,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import * as cookieParser from 'cookie-parser';
 import { Logger, LogLevel, ValidationPipe } from '@nestjs/common';
+import * as cors from "cors";
 
 dotenv.config();
 
 const host = process.env.HOST || '127.0.0.1';
 const port = process.env.PORT ? +process.env.PORT : 3000;
+
+const site_host = process.env.SITE_HOST || '127.0.0.1';
+const site_port = process.env.SITE_PORT ? +process.env.SITE_PORT : 5173;
 
 const logLevels = process.env.LOG_LEVEL?.split(',') as LogLevel[] || ['log', 'error', 'warn'];
 
@@ -18,6 +22,13 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useLogger(logLevels);
   app.use(cookieParser());
+
+  app.use(cors({
+    origin: `http://${site_host}:${site_port}`, // Разрешаем фронтенд
+    credentials: true,
+    methods: "GET,POST,PUT,DELETE,PATCH",
+    allowedHeaders: "Content-Type,Authorization"
+  }));
 
   // Enable global validation
   app.useGlobalPipes(new ValidationPipe({

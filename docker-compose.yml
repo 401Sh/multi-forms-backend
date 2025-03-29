@@ -17,6 +17,10 @@ services:
       - PORT=${PORT}
       - LOG_LEVEL=${LOG_LEVEL}
 
+      # настройки сайта
+      - SITE_HOST=${SITE_HOST}
+      - SITE_PORT=${SITE_PORT}
+
       # настройки jwt
       - ACCESS_TOKEN_TTL=${ACCESS_TOKEN_TTL}
       - REFRESH_TOKEN_TTL=${REFRESH_TOKEN_TTL}
@@ -26,7 +30,7 @@ services:
       - "${PORT}:${PORT}"
     depends_on:
       - db
-    restart: always
+    restart: unless-stopped
 
   db:
     image: mariadb
@@ -40,14 +44,14 @@ services:
       - "${DB_PORT}:3306"
     volumes:
       - db_data:/var/lib/mysql
-    restart: always
+    restart: unless-stopped
 
   adminer:
     image: adminer
     container_name: adminer-ui
     ports:
       - "8080:8080"
-    restart: always
+    restart: unless-stopped
 
 volumes:
   db_data:

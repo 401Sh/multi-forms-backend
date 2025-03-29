@@ -16,7 +16,7 @@ export class CreateAnswerDto {
   })
   @IsString()
   @IsOptional()
-  answerText: string;
+  answerText?: string;
 
   @ApiPropertyOptional({
     description: 'Массив UUID выбранных вариантов ответа (только для вопросов с вариантами ответа)',
@@ -24,5 +24,5 @@ export class CreateAnswerDto {
   })
   @IsArray()
   @IsOptional()
-  answerOptions: string[]
+  answerOptions?: string[]
 };

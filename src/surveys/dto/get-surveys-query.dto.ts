@@ -9,7 +9,7 @@ export class GetSurveysQueryDto {
   })
   @IsString()
   @IsOptional()
-  search: string;
+  search?: string;
 
   @ApiPropertyOptional({
     description: 'Номер страницы (начинается с 1)',
@@ -20,7 +20,7 @@ export class GetSurveysQueryDto {
   @IsInt()
   @IsOptional()
   @Min(1, { message: 'Page cannot be less than 1' })
-  page: number;
+  page?: number;
 
   @ApiPropertyOptional({
     description: 'Количество опросов на странице',
@@ -31,7 +31,7 @@ export class GetSurveysQueryDto {
   @IsInt()
   @IsOptional()
   @Min(1, { message: 'Page Size cannot be less than 1' })
-  pageSize: number;
+  pageSize?: number;
 
   @ApiPropertyOptional({
     description: 'Поле для сортировки в формате: имяПоля:направлениеСортировки (сортировка может быть ASC или DESC)',
@@ -39,6 +39,8 @@ export class GetSurveysQueryDto {
   })
   @IsString()
   @IsOptional()
-  @Matches(/^\S+$/, { message: 'Ordering must be without spaces' })
-  ordering: string;
+  @Matches(/^[a-zA-Z_]+:(ASC|DESC)$/i, {
+    message: 'Ordering must be in the format "field:ASC" or "field:DESC".',
+  })
+  ordering?: string;
 };
