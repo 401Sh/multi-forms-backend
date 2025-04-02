@@ -47,17 +47,19 @@ export class QuestionsService {
       const position = await this.checkQuestionPosition(
         queryRunner,
         surveyId,
-        data.position
-      )
+        data.position,
+        false
+      );
   
+      await this.moveDownPositions(
+        queryRunner, survey.id, data.position
+      );
+
       const question = await queryRunner.manager.save(
         QuestionEntity,
         { survey: { id: survey.id }, ...data, position }
       );
       
-      await this.moveDownPositions(
-        queryRunner, survey.id, question.position
-      )
   
       if (data.type != QuestionType.TEXT) {
         let questionOption = await queryRunner.manager.save(
@@ -117,7 +119,7 @@ export class QuestionsService {
       // const hasChanges = Object.entries(data).some(([key, value]) => data[key] !== value);
       // if (!hasChanges) {
       //   return question;
-      // }
+      // };
 
       let newPoints: number | undefined;
 
@@ -139,7 +141,7 @@ export class QuestionsService {
           question.points = newPoints;
         } else {
           newPoints = 0;
-        }
+        };
       } else {
         if (data.questionOptions) {
           QuestionsService.logger.debug('Cannot update TEXT question. Incorrect data input');
@@ -161,10 +163,19 @@ export class QuestionsService {
       // Update question position and move other questions
       if (data.position !== undefined) {
         const newPosition = await this.checkQuestionPosition(
-          queryRunner, question.survey.id, data.position
-        )
+          queryRunner, question.survey.id, data.position, true
+        );
         await this.reorderPositions(
           queryRunner, oldSurveyId, oldPosition, newPosition
+        );
+        console.log(newPosition)
+        console.log(data.position)
+        console.log(question.position)
+        // Update position of main question
+        await queryRunner.manager.update(
+          QuestionEntity,
+          { id: question.id},
+          { position: newPosition }
         );
       };
 
@@ -200,11 +211,11 @@ export class QuestionsService {
   ) {
     let updateData: Partial<UpdateQuestionDto>
     if (question.type == QuestionType.TEXT) {
-      const { position, questionOptions, ...otherData } = data
-      updateData = otherData
+      const { position, questionOptions, ...otherData } = data;
+      updateData = otherData;
     } else {
-      const { position, answer, points, questionOptions, ...otherData } = data
-      updateData = otherData
+      const { position, answer, points, questionOptions, ...otherData } = data;
+      updateData = otherData;
     };
     
     await queryRunner.manager.update(QuestionEntity, question.id, updateData);
@@ -228,7 +239,7 @@ export class QuestionsService {
     if (hasDuplicatePositions) {
       QuestionsService.logger.debug('Cannot create question options. Dublicated positions');
       throw new BadRequestException('Question options cannot have duplicate positions');
-    }
+    };
 
     if (question.type === QuestionType.RADIO) {
       const correctOptionsCount = options.filter(option => option.isCorrect).length;
@@ -236,8 +247,8 @@ export class QuestionsService {
       if (correctOptionsCount > 1) {
         QuestionsService.logger.debug(`Cannot update options in question ${question.id}. Radio can't have more than one correct answer`);
         throw new BadRequestException('There can be only one correct option for a radio question');
-      }
-    }
+      };
+    };
 
     // Delete old options
     await queryRunner.manager.delete(
@@ -284,7 +295,7 @@ export class QuestionsService {
     if (result.affected === 0) {
       QuestionsService.logger.debug(`Cannot update totalPoints in survey ${surveyId}. No such survey`);
       throw new NotFoundException(`Survey with ID ${surveyId} not found`);
-    }
+    };
   };
 
 
@@ -319,13 +330,6 @@ export class QuestionsService {
       .where('surveyId = :surveyId', { surveyId })
       .andWhere(rangeCondition, { newPosition, oldPosition })
       .execute();
-
-    // Update position of main question
-    await queryRunner.manager.update(
-      QuestionEntity,
-      { survey: { id: surveyId }, position: oldPosition },
-      { position: newPosition }
-    );
   };
 
 
@@ -358,7 +362,7 @@ export class QuestionsService {
     surveyId: string,
     position: number,
   ) {
-    const newPosition = position + 1
+    const newPosition = position
     // Move down all questions
     await queryRunner.manager
       .createQueryBuilder()
@@ -377,17 +381,20 @@ export class QuestionsService {
    * @param {QueryRunner} queryRunner QuerryRunner for Typeorm transaction
    * @param {string} surveyId Survey uuid
    * @param {number} newPosition Position to check
+   * @param {boolean} includeSelf Include self question to max position calculation
+   * (must be True if question already exists in DB)
    * @returns {Promise<number>} Given position or highest position in DB + 1
    */
   private async checkQuestionPosition(
     queryRunner: QueryRunner,
     surveyId: string,
-    newPosition: number
+    newPosition: number,
+    includeSelf: boolean
   ) {
     if (newPosition < 1) {
       QuestionsService.logger.debug('Cannot create question. Negative position');
       throw new BadRequestException('Question position cant be negative');
-    }
+    };
 
     const maxPosition = await queryRunner.manager
     .createQueryBuilder(QuestionEntity, 'question')
@@ -395,9 +402,11 @@ export class QuestionsService {
     .where('question.surveyId = :surveyId', { surveyId })
     .getRawOne();
 
+    if (includeSelf) maxPosition.maxPosition -= 1
+
     const position = newPosition > maxPosition.maxPosition
       ? maxPosition.maxPosition + 1 : newPosition;
-    return position
+    return position;
   };
 
 
