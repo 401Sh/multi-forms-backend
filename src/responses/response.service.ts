@@ -216,12 +216,38 @@ export class ResponsesService {
     ResponsesService.logger.log(`Finding all responses for survey: ${surveyId}`);
     
     const responses = await this.responseRepository
-      .createQueryBuilder('responses')
-      .leftJoinAndSelect('responses.answers', 'answers')
-      .leftJoinAndSelect('answers.answerOptions', 'answerOptions')
-      .where('responses.surveyId = :surveyId', { surveyId })
-      .getMany();
+    .createQueryBuilder('responses')
+    .leftJoinAndSelect('responses.answers', 'answers')
+    .leftJoinAndSelect('answers.answerOptions', 'answerOptions')
+    .leftJoin('answers.question', 'question')
+    .leftJoin('answerOptions.questionOption', 'option')
+    .addSelect([
+      'question.id',
+      'question.type',
+      'question.name',
+      'option.id', 'option.text'
+    ])
+    .where('responses.surveyId = :surveyId', { surveyId })
+    .getMany();
+    
+    // bad solution, but can't fix typeorm problem with addSelect
+    return responses.map(response => ({
+      ...response,
+      answers: response.answers.map(answer => {
+        const questionId = answer.question?.id || null;
+        const { question, ...rest } = answer;
 
-    return responses;
+        return {
+          questionId,
+          ...rest,
+
+          answerOptions: answer.answerOptions.map(option => {
+            const optionId = option.questionOption?.id || null;
+            const { questionOption, ...optRest } = option;
+            return optionId
+          })
+        };
+      })
+    }));
   };
 };
